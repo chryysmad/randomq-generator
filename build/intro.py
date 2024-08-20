@@ -12,6 +12,7 @@ class IntroPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
+        self.selected_option = None
         self.configure(bg="#F5F5F5")
 
         canvas = tk.Canvas(
@@ -48,7 +49,7 @@ class IntroPage(tk.Frame):
             image=button_image_1,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: controller.show_frame("ParametersPage"),
+            command=lambda: self.set_option("MCQ"),
             relief="flat"
         )
         button_1.image = button_image_1 
@@ -60,7 +61,7 @@ class IntroPage(tk.Frame):
             image=button_image_2,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_2 clicked"),
+            command=lambda: self.set_option("FIB"),
             relief="flat"
         )
         button_2.image = button_image_2
@@ -70,3 +71,10 @@ class IntroPage(tk.Frame):
         OUTPUT_PATH = Path(__file__).parent
         ASSETS_PATH = OUTPUT_PATH / Path(r"/home/chrysmad/randomq-generator/build/assets/frame4")
         return ASSETS_PATH / Path(path)
+
+    def set_option(self, option):
+        self.selected_option = option
+        print(f"Selected option: {option}")
+        self.controller.show_frame("ParametersPage")
+
+    

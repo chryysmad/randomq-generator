@@ -6,6 +6,7 @@
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 import tkinter as tk
 from pathlib import Path
+from build.correct import CorrectPage
 
 class ParametersPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -146,10 +147,9 @@ class ParametersPage(tk.Frame):
             image=self.button_image_2,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_2 clicked"),
+            command=lambda: controller.show_frame("CorrectPage"),
             relief="flat"
         )
         button_2.place(x=402.0, y=462.0, width=190.0, height=34.0)
-
 
         canvas.pack()

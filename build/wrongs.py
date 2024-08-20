@@ -4,188 +4,135 @@
 
 
 from pathlib import Path
-
-# from tkinter import *
-# Explicit imports to satisfy Flake8
+import tkinter as tk
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+from build.randomizer import RandomizerPage
 
+class WrongsPage(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+        self.configure(bg="#F5F5F5")
 
-OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path(r"/home/chrysmad/randomq-generator/build/assets/frame1")
+        OUTPUT_PATH = Path(__file__).parent
+        ASSETS_PATH = OUTPUT_PATH / Path(r"/home/chrysmad/randomq-generator/build/assets/frame1")
 
+        def relative_to_assets(path: str) -> Path:
+            return ASSETS_PATH / Path(path)
 
-def relative_to_assets(path: str) -> Path:
-    return ASSETS_PATH / Path(path)
+        self.canvas = tk.Canvas(
+            self,
+            bg="#F5F5F5",
+            height=547,
+            width=994,
+            bd=0,
+            highlightthickness=0,
+            relief="ridge"
+        )
+        self.canvas.place(x=0, y=0)
 
+        self.canvas.create_text(
+            24.0, 64.0,
+            anchor="nw",
+            text="Wrong Answers",
+            fill="#1E1E1E",
+            font=("Inter", 20 * -1)
+        )
 
-window = Tk()
+        self.canvas.create_text(
+            24.0, 98.0,
+            anchor="nw",
+            text="Here you can set either the answer text (t:) to be parsed as a string or the answer function (f:) in terms of the parameters given in the previous page to calculate the wrong answer option.",
+            fill="#757575",
+            font=("Inter", 16 * -1)
+        )
 
-window.geometry("994x547")
-window.configure(bg = "#F5F5F5")
+        self.canvas.create_text(
+            180.0, 184.0,
+            anchor="nw",
+            text="Option 1:",
+            fill="#1E1E1E",
+            font=("Inter", 16 * -1)
+        )
 
+        self.entry_image_1 = tk.PhotoImage(file=relative_to_assets("entry_1.png"))
+        self.canvas.create_image(
+            497.0, 195.5,
+            image=self.entry_image_1
+        )
+        self.entry_1 = tk.Entry(self, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        self.entry_1.place(x=272.0, y=174.0, width=450.0, height=41.0)
 
-canvas = Canvas(
-    window,
-    bg = "#F5F5F5",
-    height = 547,
-    width = 994,
-    bd = 0,
-    highlightthickness = 0,
-    relief = "ridge"
-)
+        self.button_image_1 = tk.PhotoImage(file=relative_to_assets("button_1.png"))
+        self.button_1 = tk.Button(
+            self,
+            image=self.button_image_1,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: print("button_1 clicked"),
+            relief="flat"
+        )
+        self.button_1.place(x=474.0, y=250.0, width=46.0, height=26.0)
 
-canvas.place(x = 0, y = 0)
-canvas.create_text(
-    24.0,
-    64.0,
-    anchor="nw",
-    text="Wrong Answers",
-    fill="#1E1E1E",
-    font=("Inter", 20 * -1)
-)
+        self.canvas.create_text(
+            24.0, 339.0,
+            anchor="nw",
+            text="Specify how many of the wrong generated answers you want to be displayed to the student (Suggestion: 3)",
+            fill="#757575",
+            font=("Inter", 16 * -1)
+        )
 
-canvas.create_text(
-    24.0,
-    98.0,
-    anchor="nw",
-    text="Here you can set either the answer text (t:) to be parsed as a string or the answer function (f:) in terms of the",
-    fill="#757575",
-    font=("Inter", 16 * -1)
-)
+        self.canvas.create_text(
+            341.0, 392.0,
+            anchor="nw",
+            text="Number:",
+            fill="#1E1E1E",
+            font=("Inter", 16 * -1)
+        )
 
-canvas.create_text(
-    24.0,
-    120.0,
-    anchor="nw",
-    text="parameters given in the previous page to calculate the wrong answer option.  ",
-    fill="#757575",
-    font=("Inter", 16 * -1)
-)
+        self.entry_image_2 = tk.PhotoImage(file=relative_to_assets("entry_2.png"))
+        self.canvas.create_image(
+            497.0, 404.5,
+            image=self.entry_image_2
+        )
+        self.entry_2 = tk.Entry(self, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        self.entry_2.place(x=432.0, y=384.0, width=130.0, height=39.0)
 
-canvas.create_text(
-    180.0,
-    184.0,
-    anchor="nw",
-    text="Option 1:",
-    fill="#1E1E1E",
-    font=("Inter", 16 * -1)
-)
+        placeholders = {
+            self.entry_1: "Enter the string / function here...", 
+            self.entry_2: "Enter a value..."
+        }
 
-entry_image_1 = PhotoImage(
-    file=relative_to_assets("entry_1.png"))
-entry_bg_1 = canvas.create_image(
-    497.0,
-    195.5,
-    image=entry_image_1
-)
-entry_1 = Entry(
-    bd=0,
-    bg="#FFFFFF",
-    fg="#000716",
-    highlightthickness=0
-)
-entry_1.place(
-    x=272.0,
-    y=174.0,
-    width=450.0,
-    height=41.0
-)
+        def on_focus_in(event):
+            entry = event.widget
+            placeholder = placeholders.get(entry)
+            if placeholder and entry.get() == placeholder:
+                entry.delete(0, "end")
+                entry.config(fg="#000716")
 
-button_image_1 = PhotoImage(
-    file=relative_to_assets("button_1.png"))
-button_1 = Button(
-    image=button_image_1,
-    borderwidth=0,
-    highlightthickness=0,
-    command=lambda: print("button_1 clicked"),
-    relief="flat"
-)
-button_1.place(
-    x=474.0,
-    y=250.0,
-    width=46.0,
-    height=26.0
-)
+        def on_focus_out(event):
+            entry = event.widget
+            placeholder = placeholders.get(entry)
+            if placeholder and entry.get() == "":
+                entry.insert(0, placeholder)
+                entry.config(fg="#C0C0C0")
 
-canvas.create_text(
-    24.0,
-    339.0,
-    anchor="nw",
-    text="Specify how many of the wrong generated answers you want to be displayed to the student (Suggestion: 3)",
-    fill="#757575",
-    font=("Inter", 16 * -1)
-)
+        for entry in placeholders.keys():
+            entry.insert(0, placeholders[entry])
+            entry.config(fg="#C0C0C0")
+            entry.bind("<FocusIn>", on_focus_in)
+            entry.bind("<FocusOut>", on_focus_out)
 
-canvas.create_text(
-    341.0,
-    392.0,
-    anchor="nw",
-    text="Number:",
-    fill="#1E1E1E",
-    font=("Inter", 16 * -1)
-)
+        self.button_image_2 = tk.PhotoImage(file=relative_to_assets("button_2.png"))
+        self.button_2 = tk.Button(
+            self,
+            image=self.button_image_2,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: controller.show_frame("RandomizerPage"),
+            relief="flat"
+        )
+        self.button_2.place(x=402.0, y=465.0, width=190.0, height=34.0)
 
-entry_image_2 = PhotoImage(
-    file=relative_to_assets("entry_2.png"))
-entry_bg_2 = canvas.create_image(
-    497.0,
-    404.5,
-    image=entry_image_2
-)
-entry_2 = Entry(
-    bd=0,
-    bg="#FFFFFF",
-    fg="#000716",
-    highlightthickness=0
-)
-entry_2.place(
-    x=432.0,
-    y=384.0,
-    width=130.0,
-    height=39.0
-)
-
-
-placeholders = {
-    entry_1: "Enter the string / function here...", 
-    entry_2: "Enter a value..."
-}
-
-def on_focus_in(event):
-    entry = event.widget
-    placeholder = placeholders.get(entry)
-    if placeholder and entry.get() == placeholder:
-        entry.delete(0, "end")
-        entry.config(fg="#000716")
-    
-def on_focus_out(event):
-    entry = event.widget
-    placeholder = placeholders.get(entry)
-    if placeholder and entry.get() == "":
-        entry.insert(0, placeholder)
-        entry.config(fg="#C0C0C0")
-
-for entry in placeholders.keys():
-    entry.insert(0, placeholders[entry])
-    entry.config(fg="#C0C0C0")
-    entry.bind("<FocusIn>", on_focus_in)
-    entry.bind("<FocusOut>", on_focus_out)
-
-
-button_image_2 = PhotoImage(
-    file=relative_to_assets("button_2.png"))
-button_2 = Button(
-    image=button_image_2,
-    borderwidth=0,
-    highlightthickness=0,
-    command=lambda: print("button_2 clicked"),
-    relief="flat"
-)
-button_2.place(
-    x=402.0,
-    y=465.0,
-    width=190.0,
-    height=34.0
-)
-window.resizable(False, False)
-window.mainloop()
+        self.canvas.pack()
+        

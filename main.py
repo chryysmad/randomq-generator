@@ -2,6 +2,9 @@ import tkinter as tk
 from pathlib import Path
 from build.parameters import ParametersPage
 from build.intro import IntroPage
+from build.correct import CorrectPage
+from build.wrongs import WrongsPage
+from build.randomizer import RandomizerPage
 
 class BaseApp(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -19,7 +22,7 @@ class BaseApp(tk.Tk):
 
         self.frames = {}
 
-        for F in (IntroPage, ParametersPage):
+        for F in (IntroPage, ParametersPage, CorrectPage, WrongsPage, RandomizerPage):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
