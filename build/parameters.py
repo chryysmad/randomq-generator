@@ -12,6 +12,7 @@ class ParametersPage(tk.Frame):
         self.ASSETS_PATH = OUTPUT_PATH / Path(r"/home/chrysmad/randomq-generator/build/assets/frame3")
 
         self.param_count = 1
+        self.placeholders = {}
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=0)
@@ -31,23 +32,18 @@ class ParametersPage(tk.Frame):
         self.scrollable_frame = tk.Frame(self)
         self.scrollable_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
 
-        # Canvas and Scrollbar setup
         self.canvas = tk.Canvas(self.scrollable_frame, bg="#F5F5F5", bd=0, highlightthickness=0)
         self.scrollbar = tk.Scrollbar(self.scrollable_frame, orient="vertical", command=self.canvas.yview)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
-        # Pack the canvas and scrollbar
         self.canvas.pack(side="left", fill="both", expand=True)
         self.scrollbar.pack(side="right", fill="y")
 
-        # Frame inside the canvas to hold the scrollable content
         self.inner_frame = tk.Frame(self.canvas, bg="#F5F5F5")
         self.canvas.create_window((0, 0), window=self.inner_frame, anchor="nw")
 
-        # Update the scroll region when the size of the inner_frame changes
         self.inner_frame.bind("<Configure>", self.update_scroll_region)
 
-        # Add initial content
         self.create_middle_section()
 
         # Bottom section: "+" button and "Next" button 
@@ -56,7 +52,6 @@ class ParametersPage(tk.Frame):
 
         self.create_bottom_section()
 
-        # Bind mouse scroll to canvas
         self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
 
     def relative_to_assets(self, path: str) -> Path:
@@ -86,40 +81,95 @@ class ParametersPage(tk.Frame):
         self.canvas.create_image(497.0, 178.5, image=entry_image_1)
         self.entry_1 = Text(self.top_frame, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
         self.entry_1.place(x=32.0, y=120.0, width=930.0, height=115.0)
-        self.entry_1.insert("1.0", "Add here...")
+        
+
+        self.placeholders = {self.entry_1: "Add here..."}
+        def on_focus_in(event):
+            entry = event.widget
+            placeholder = self.placeholders.get(entry)
+            if placeholder and entry.get("1.0", "end-1c") == placeholder:
+                entry.delete("1.0", "end")
+                entry.config(fg="#000716")
+
+        def on_focus_out(event):
+            entry = event.widget
+            placeholder = self.placeholders.get(entry)
+            if placeholder and entry.get("1.0", "end-1c") == "":
+                entry.insert("1.0", placeholder)
+                entry.config(fg="#C0C0C0")
+
+        self.entry_1.bind("<FocusIn>", on_focus_in)
+        self.entry_1.bind("<FocusOut>", on_focus_out)
+
+        # Insert the placeholder
+        self.entry_1.insert("1.0", self.placeholders[self.entry_1])
         self.entry_1.config(fg="#C0C0C0")
 
+        
+
     def create_middle_section(self):
+        # Create new widgets for the new parameter row
         label = tk.Label(self.inner_frame, text=f"Param {self.param_count}:", bg="#F5F5F5", font=("Inter", 16 * -1))
         label.grid(row=self.param_count, column=0, padx=10, pady=5, sticky="w")
 
-        self.entry_2 = tk.Entry(self.inner_frame, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
-        self.entry_2.grid(row=self.param_count, column=1, padx=5)
+        new_entry_2 = tk.Entry(self.inner_frame, width=6, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        new_entry_2.grid(row=self.param_count, column=1, padx=5)
 
         tk.Label(self.inner_frame, text="from", bg="#F5F5F5", font=("Inter", 16 * -1)).grid(row=self.param_count, column=2, padx=5)
 
-        self.entry_3 = tk.Entry(self.inner_frame, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
-        self.entry_3.grid(row=self.param_count, column=3, padx=5)
+        new_entry_3 = tk.Entry(self.inner_frame, width=10, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        new_entry_3.grid(row=self.param_count, column=3, padx=5)
 
         tk.Label(self.inner_frame, text="to", bg="#F5F5F5", font=("Inter", 16 * -1)).grid(row=self.param_count, column=4, padx=5)
 
-        self.entry_4 = tk.Entry(self.inner_frame, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
-        self.entry_4.grid(row=self.param_count, column=5, padx=5)
+        new_entry_4 = tk.Entry(self.inner_frame, width=10, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        new_entry_4.grid(row=self.param_count, column=5, padx=5)
 
         tk.Label(self.inner_frame, text="excluding", bg="#F5F5F5", font=("Inter", 16 * -1)).grid(row=self.param_count, column=6, padx=5)
 
-        self.entry_5 = tk.Entry(self.inner_frame, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
-        self.entry_5.grid(row=self.param_count, column=7, padx=5)
+        new_entry_5 = tk.Entry(self.inner_frame, width=15, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        new_entry_5.grid(row=self.param_count, column=7, padx=5)
 
         tk.Label(self.inner_frame, text="with", bg="#F5F5F5", font=("Inter", 16 * -1)).grid(row=self.param_count, column=8, padx=5)
 
-        self.entry_6 = tk.Entry(self.inner_frame, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
-        self.entry_6.grid(row=self.param_count, column=9, padx=5)
+        new_entry_6 = tk.Entry(self.inner_frame, width=15, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        new_entry_6.grid(row=self.param_count, column=9, padx=5)
+
+        # Create a separate placeholders dictionary for each new row of entries
+        new_placeholders = {
+            new_entry_2: "Name...",
+            new_entry_3: "Range...",
+            new_entry_4: "Range...",
+            new_entry_5: "Value...",
+            new_entry_6: "Step..."
+        }
+
+        def on_focus_in(event):
+            entry = event.widget
+            placeholder = new_placeholders.get(entry)
+            if placeholder and entry.get() == placeholder:
+                entry.delete(0, "end")
+                entry.config(fg="#000716")
+
+        def on_focus_out(event):
+            entry = event.widget
+            placeholder = new_placeholders.get(entry)
+            if placeholder and entry.get() == "":
+                entry.insert(0, placeholder)
+                entry.config(fg="#C0C0C0")
+
+        # Apply placeholders and bindings to the new entries
+        for entry, placeholder in new_placeholders.items():
+            entry.insert(0, placeholder)
+            entry.config(fg="#C0C0C0")
+            entry.bind("<FocusIn>", on_focus_in)
+            entry.bind("<FocusOut>", on_focus_out)
 
         self.param_count += 1
 
-        # Update scroll region whenever a new parameter is added
         self.update_scroll_region()
+
+
 
     def create_bottom_section(self):
         self.button_image_1 = PhotoImage(file=self.relative_to_assets("button_1.png"))
@@ -133,7 +183,7 @@ class ParametersPage(tk.Frame):
             command=self.add_parameter,
             relief="flat"
         )
-        button_1.pack(side="left", padx=5, pady=10)  # Adjusted positioning
+        button_1.pack(side="left", padx=5, pady=10)
 
         button_2 = tk.Button(
             self.bottom_frame,
@@ -143,7 +193,7 @@ class ParametersPage(tk.Frame):
             command=lambda: self.controller.show_frame("CorrectPage"),
             relief="flat"
         )
-        button_2.pack(side="right", padx=5, pady=10)  # Adjusted positioning
+        button_2.pack(side="right", padx=5, pady=10)
 
     def update_scroll_region(self, event=None):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
