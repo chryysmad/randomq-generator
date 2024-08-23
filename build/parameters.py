@@ -82,7 +82,6 @@ class ParametersPage(tk.Frame):
         self.entry_1 = Text(self.top_frame, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
         self.entry_1.place(x=32.0, y=120.0, width=930.0, height=115.0)
         
-
         self.placeholders = {self.entry_1: "Add here..."}
         def on_focus_in(event):
             entry = event.widget
@@ -101,14 +100,12 @@ class ParametersPage(tk.Frame):
         self.entry_1.bind("<FocusIn>", on_focus_in)
         self.entry_1.bind("<FocusOut>", on_focus_out)
 
-        # Insert the placeholder
         self.entry_1.insert("1.0", self.placeholders[self.entry_1])
         self.entry_1.config(fg="#C0C0C0")
 
         
 
     def create_middle_section(self):
-        # Create new widgets for the new parameter row
         label = tk.Label(self.inner_frame, text=f"Param {self.param_count}:", bg="#F5F5F5", font=("Inter", 16 * -1))
         label.grid(row=self.param_count, column=0, padx=10, pady=5, sticky="w")
 
@@ -135,7 +132,6 @@ class ParametersPage(tk.Frame):
         new_entry_6 = tk.Entry(self.inner_frame, width=15, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
         new_entry_6.grid(row=self.param_count, column=9, padx=5)
 
-        # Create a separate placeholders dictionary for each new row of entries
         new_placeholders = {
             new_entry_2: "Name...",
             new_entry_3: "Range...",
@@ -158,7 +154,6 @@ class ParametersPage(tk.Frame):
                 entry.insert(0, placeholder)
                 entry.config(fg="#C0C0C0")
 
-        # Apply placeholders and bindings to the new entries
         for entry, placeholder in new_placeholders.items():
             entry.insert(0, placeholder)
             entry.config(fg="#C0C0C0")
@@ -168,7 +163,6 @@ class ParametersPage(tk.Frame):
         self.param_count += 1
 
         self.update_scroll_region()
-
 
 
     def create_bottom_section(self):
