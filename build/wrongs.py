@@ -8,7 +8,7 @@ class WrongsPage(tk.Frame):
         self.controller = controller
         self.configure(bg="#F5F5F5")
 
-        self.visible_options = 1  # Start with only 1 option visible
+        self.visible_options = 1 
         self.entries = []
 
         # Top section: Non-scrollable
@@ -52,11 +52,9 @@ class WrongsPage(tk.Frame):
         description.pack(anchor="nw", padx=10)
 
     def create_middle_section(self):
-        # Initially display only the first option
         self.add_entry_field(1)
 
     def create_bottom_section(self):
-        # Add button to add more options
         button_1_img = PhotoImage(file=self.relative_to_assets("button_1.png"))
         button_1 = tk.Button(
             self.bottom_frame,
@@ -67,22 +65,43 @@ class WrongsPage(tk.Frame):
             bd=0,
             activebackground="#F5F5F5"
         )
-        button_1.image = button_1_img  # Keep a reference to the image to prevent garbage collection
+        button_1.image = button_1_img 
         button_1.pack(pady=5)
 
-        # Label for number specification
         number_label_info = tk.Label(self.bottom_frame, text="Specify how many of the wrong generated answers you want to be displayed to the student (Suggestion: 3)",
                                      bg="#F5F5F5", fg="#757575", font=("Inter", 14 * -1), wraplength=800, justify="left")
         number_label_info.pack(anchor="w", padx=10, pady=(5, 0))
 
-        # Entry for specifying how many wrong answers to show
         number_label = tk.Label(self.bottom_frame, text="Number:", bg="#F5F5F5", fg="#1E1E1E", font=("Inter", 16 * -1))
         number_label.pack(side="left", padx=(10, 0))
 
         entry = tk.Entry(self.bottom_frame, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
         entry.pack(side="left", padx=(10, 0), pady=10, fill="x", expand=True)
 
-        # Next button
+        placeholders = {
+            entry: "Enter a value here..."
+        }
+
+        def on_focus_in(event):
+            entry = event.widget
+            placeholder = placeholders.get(entry)
+            if placeholder and entry.get() == placeholder:
+                entry.delete(0, "end")
+                entry.config(fg="#000716")
+            
+        def on_focus_out(event):
+            entry = event.widget
+            placeholder = placeholders.get(entry)
+            if placeholder and entry.get() == "":
+                entry.insert(0, placeholder)
+                entry.config(fg="#C0C0C0")
+
+        for entry in placeholders.keys():
+            entry.insert(0, placeholders[entry])
+            entry.config(fg="#C0C0C0")
+            entry.bind("<FocusIn>", on_focus_in)
+            entry.bind("<FocusOut>", on_focus_out)
+
         button_2_img = PhotoImage(file=self.relative_to_assets("button_2.png"))
         button_2 = tk.Button(
             self.bottom_frame,
@@ -93,7 +112,7 @@ class WrongsPage(tk.Frame):
             bd=0,
             activebackground="#F5F5F5"
         )
-        button_2.image = button_2_img  # Keep a reference to the image to prevent garbage collection
+        button_2.image = button_2_img 
         button_2.pack(side="right", padx=5, pady=10)
 
     def update_scroll_region(self, event=None):
@@ -102,6 +121,30 @@ class WrongsPage(tk.Frame):
     def add_entry_field(self, index):
         label = tk.Label(self.inner_frame, text=f"Option {index}:", bg="#F5F5F5", font=("Inter", 12))
         entry = tk.Entry(self.inner_frame, width=50, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+
+        new_placeholders = {
+            entry: "Enter the string or function here..."
+        }
+
+        def on_focus_in(event):
+            entry = event.widget
+            placeholder = new_placeholders.get(entry)
+            if placeholder and entry.get() == placeholder:
+                entry.delete(0, "end")
+                entry.config(fg="#000716")
+
+        def on_focus_out(event):
+            entry = event.widget
+            placeholder = new_placeholders.get(entry)
+            if placeholder and entry.get() == "":
+                entry.insert(0, placeholder)
+                entry.config(fg="#C0C0C0")
+
+        for entry, placeholder in new_placeholders.items():
+            entry.insert(0, placeholder)
+            entry.config(fg="#C0C0C0")
+            entry.bind("<FocusIn>", on_focus_in)
+            entry.bind("<FocusOut>", on_focus_out)
 
         label.grid(row=index, column=0, padx=10, pady=5, sticky="w")
         entry.grid(row=index, column=1, padx=5)
