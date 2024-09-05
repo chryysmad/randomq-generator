@@ -15,6 +15,7 @@ class ParametersPage(tk.Frame):
 
         self.param_count = 1
         self.placeholders = {}
+        self.entries = []
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=0)
@@ -120,31 +121,38 @@ class ParametersPage(tk.Frame):
         
 
     def create_middle_section(self):
+        param_frame = {}
+
         label = tk.Label(self.inner_frame, text=f"Param {self.param_count}:", bg="#F5F5F5", font=("Inter", 16 * -1))
         label.grid(row=self.param_count, column=0, padx=10, pady=5, sticky="w")
 
         self.entry_2 = tk.Entry(self.inner_frame, width=6, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
         self.entry_2.grid(row=self.param_count, column=1, padx=5)
+        param_frame['name'] = self.entry_2
 
         tk.Label(self.inner_frame, text="from", bg="#F5F5F5", font=("Inter", 16 * -1)).grid(row=self.param_count, column=2, padx=5)
 
         self.entry_3 = tk.Entry(self.inner_frame, width=10, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
         self.entry_3.grid(row=self.param_count, column=3, padx=5)
+        param_frame['range_from'] = self.entry_3
 
         tk.Label(self.inner_frame, text="to", bg="#F5F5F5", font=("Inter", 16 * -1)).grid(row=self.param_count, column=4, padx=5)
 
         self.entry_4 = tk.Entry(self.inner_frame, width=10, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
         self.entry_4.grid(row=self.param_count, column=5, padx=5)
+        param_frame['range_to'] = self.entry_4
 
         tk.Label(self.inner_frame, text="excluding", bg="#F5F5F5", font=("Inter", 16 * -1)).grid(row=self.param_count, column=6, padx=5)
 
         self.entry_5 = tk.Entry(self.inner_frame, width=15, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
         self.entry_5.grid(row=self.param_count, column=7, padx=5)
+        param_frame['excluding'] = self.entry_5
 
         tk.Label(self.inner_frame, text="with", bg="#F5F5F5", font=("Inter", 16 * -1)).grid(row=self.param_count, column=8, padx=5)
 
         self.entry_6 = tk.Entry(self.inner_frame, width=15, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
         self.entry_6.grid(row=self.param_count, column=9, padx=5)
+        param_frame['step'] = self.entry_6
 
         new_placeholders = {
             self.entry_2: "Name...",
@@ -174,6 +182,7 @@ class ParametersPage(tk.Frame):
             entry.bind("<FocusIn>", on_focus_in)
             entry.bind("<FocusOut>", on_focus_out)
 
+        self.entries.append(param_frame)
         self.param_count += 1
         self.update_scroll_region()
 
@@ -217,17 +226,16 @@ class ParametersPage(tk.Frame):
         print("SymPy Expression:", self.latex_question)
         self.controller.save_latex_question(self.latex_question)
 
-        param_data = {
-            "name": self.entry_2.get(),
-            "range_from": self.entry_3.get(),
-            "range_to": self.entry_4.get(),
-            "excluding": self.entry_5.get(),
-            "step": self.entry_6.get(),
-        }
-        self.parameters_data.append(param_data)
-        print(f"Added parameter: {param_data}")
+        for param_frame in self.entries:
+            param_data = {
+                "name": param_frame['name'].get(),
+                "range_from": param_frame['range_from'].get(),
+                "range_to": param_frame['range_to'].get(),
+                "excluding": param_frame['excluding'].get(),
+                "step": param_frame['step'].get(),
+            }
+            self.parameters_data.append(param_data)
 
         print("Parameters Data:", self.parameters_data)
         self.controller.save_parameters(self.parameters_data)
-        
         self.controller.show_frame("CorrectPage")

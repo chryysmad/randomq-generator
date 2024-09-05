@@ -1,15 +1,18 @@
 from pathlib import Path
 import tkinter as tk
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Radiobutton, StringVar
+from sympy.parsing.latex import parse_latex
+from sympy import sympify, Symbol
 from build.wrongs import WrongsPage
 from build.randomizer import RandomizerPage
-
 
 class CorrectPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
         self.configure(bg="#F5F5F5")
+
+        self.function_sympy = None
 
         OUTPUT_PATH = Path(__file__).parent
         ASSETS_PATH = OUTPUT_PATH / Path(r"/home/chrysmad/randomq-generator/build/assets/frame2")
@@ -136,7 +139,7 @@ class CorrectPage(tk.Frame):
             image=button_image_1,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: self.go_to_next_page(),
+            command=lambda: [self.convert_latex_to_sympy(entry_1.get()), self.go_to_next_page()],
             relief="flat"
         )
         button_1.place(x=402.0, y=414.0, width=190.0, height=34.0)
@@ -146,6 +149,14 @@ class CorrectPage(tk.Frame):
         canvas.pack()
 
         update_entry_state()
+
+    def convert_latex_to_sympy(self, latex_str):
+        try:
+            self.function_sympy = parse_latex(latex_str)
+            print(f"Sympy Expression: {self.function_sympy}")  
+
+        except Exception as e:
+            print(f"Error converting LaTeX to SymPy: {e}")
 
     def go_to_next_page(self):
         intro_page = self.controller.frames["IntroPage"]
