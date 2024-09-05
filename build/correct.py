@@ -58,16 +58,15 @@ class CorrectPage(tk.Frame):
 
         font_setting = ("Inter", 16 * -1)
 
-        # Define the function to enable/disable the entry field based on the selected radio button
         def update_entry_state():
             if radio_value.get() == "auto":
-                entry_1.config(state="disabled", fg="#C0C0C0")  # Keep placeholder when disabled
+                entry_1.config(state="disabled", fg="#C0C0C0")  
                 if entry_1.get() == "":
                     entry_1.insert(0, placeholders[entry_1])
             else:
-                entry_1.config(state="normal", fg="#C0C0C0")  # Enable typing when 'function' is selected
+                entry_1.config(state="normal", fg="#C0C0C0")
                 if entry_1.get() == placeholders[entry_1]:
-                    entry_1.config(fg="#C0C0C0")  # Keep placeholder look until the user focuses in
+                    entry_1.config(fg="#C0C0C0") 
 
         radio_auto = tk.Radiobutton(
             self,
@@ -76,7 +75,7 @@ class CorrectPage(tk.Frame):
             value="auto",
             bg="#F5F5F5",
             font=font_setting,
-            command=update_entry_state  # Call the function to disable entry
+            command=update_entry_state
         )
         radio_auto.place(x=305.0, y=211.0)
 
@@ -87,7 +86,7 @@ class CorrectPage(tk.Frame):
             value="function",
             bg="#F5F5F5",
             font=font_setting,
-            command=update_entry_state  # Call the function to enable entry
+            command=update_entry_state 
         )
         radio_function.place(x=503.0, y=211.0)
 
@@ -111,7 +110,7 @@ class CorrectPage(tk.Frame):
 
         def on_focus_in(event):
             entry = event.widget
-            if entry.cget('state') == "normal":  # Check if the entry is enabled
+            if entry.cget('state') == "normal":
                 placeholder = placeholders.get(entry)
                 if placeholder and entry.get() == placeholder:
                     entry.delete(0, "end")
@@ -119,13 +118,12 @@ class CorrectPage(tk.Frame):
             
         def on_focus_out(event):
             entry = event.widget
-            if entry.cget('state') == "normal":  # Check if the entry is enabled
+            if entry.cget('state') == "normal":  
                 placeholder = placeholders.get(entry)
                 if placeholder and entry.get() == "":
                     entry.insert(0, placeholder)
                     entry.config(fg="#C0C0C0")
 
-        # Add placeholder text and bind focus events
         for entry in placeholders.keys():
             entry.insert(0, placeholders[entry])
             entry.config(fg="#C0C0C0")
@@ -147,7 +145,6 @@ class CorrectPage(tk.Frame):
 
         canvas.pack()
 
-        # Call the function initially to set the correct state
         update_entry_state()
 
     def go_to_next_page(self):
