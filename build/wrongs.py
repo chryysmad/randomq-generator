@@ -1,6 +1,7 @@
 import tkinter as tk
 from pathlib import Path
 from tkinter import PhotoImage
+from sympy.parsing.latex import parse_latex 
 
 class WrongsPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -8,8 +9,10 @@ class WrongsPage(tk.Frame):
         self.controller = controller
         self.configure(bg="#F5F5F5")
 
-        self.visible_options = 1 
-        self.entries = []
+        self.visible_options = 1  
+        self.entries = []  
+        self.wrong_answers = []
+        self.answer_number = 0
 
         # Top section: Non-scrollable
         self.top_frame = tk.Frame(self, bg="#F5F5F5")
@@ -75,11 +78,11 @@ class WrongsPage(tk.Frame):
         number_label = tk.Label(self.bottom_frame, text="Number:", bg="#F5F5F5", fg="#1E1E1E", font=("Inter", 16 * -1))
         number_label.pack(side="left", padx=(10, 0))
 
-        entry = tk.Entry(self.bottom_frame, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
-        entry.pack(side="left", padx=(10, 0), pady=10, fill="x", expand=True)
+        self.answer_number_entry = tk.Entry(self.bottom_frame, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        self.answer_number_entry.pack(side="left", padx=(10, 0), pady=10, fill="x", expand=True)
 
         placeholders = {
-            entry: "Enter a value here..."
+            self.answer_number_entry: "Enter a value here..."
         }
 
         def on_focus_in(event):
@@ -106,7 +109,7 @@ class WrongsPage(tk.Frame):
         button_2 = tk.Button(
             self.bottom_frame,
             image=button_2_img,
-            command=lambda: self.controller.show_frame("RandomizerPage"),
+            command=self.process_entries_and_continue,
             relief="flat",
             bg="#F5F5F5",
             bd=0,
@@ -156,3 +159,29 @@ class WrongsPage(tk.Frame):
         self.add_entry_field(index)
         self.visible_options += 1
         self.update_scroll_region()
+
+    def process_entries_and_continue(self):
+        self.wrong_answers.clear()
+
+        for label, entry in self.entries:
+            text = entry.get().strip()
+            if text.startswith("t:"):
+                self.wrong_answers.append(text[2:].strip())
+            elif text.startswith("f:"):
+                latex_str = text[2:].strip()
+                try:
+                    sympy_expr = parse_latex(latex_str)
+                    self.wrong_answers.append(sympy_expr)
+                except Exception as e:
+                    print(f"Error parsing LaTeX: {e}")
+                    self.wrong_answers.append(None)
+
+        try:
+            self.answer_number = int(self.answer_number_entry.get().strip())
+        except ValueError:
+            self.answer_number = 0  
+
+        print(f"Wrong Answers: {self.wrong_answers}")
+        print(f"Number of wrong answers to display: {self.answer_number}")
+
+        self.controller.show_frame("RandomizerPage")
