@@ -9,7 +9,7 @@ class RandomizerPage(tk.Frame):
         self.controller = controller
         self.configure(bg="#F5F5F5")
 
-        self.randomization_count = 0  # To store the number of times to randomize
+        self.randomization_count = 0 
 
         OUTPUT_PATH = Path(__file__).parent
         ASSETS_PATH = OUTPUT_PATH / Path(r"/home/chrysmad/randomq-generator/build/assets/frame0")
@@ -101,8 +101,6 @@ class RandomizerPage(tk.Frame):
         try:
             self.randomization_count = int(self.entry_1.get().strip())
         except ValueError:
-            self.randomization_count = 0  # Handle invalid input
+            self.randomization_count = 0
 
         print(f"Number of times to randomize: {self.randomization_count}")
-        # You can store or pass this value to another part of the program for further use
-        # For example: self.controller.some_method(self.randomization_count)
