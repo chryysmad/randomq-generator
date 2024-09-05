@@ -10,6 +10,11 @@ class BaseApp(tk.Tk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.shared_data = {
+            "latex_question": None,
+            "parameters": []
+        }
+
         self.title("Random Question Generator")
         self.geometry("994x547")
         self.configure(bg="#F5F5F5")
@@ -33,6 +38,12 @@ class BaseApp(tk.Tk):
     def show_frame(self, page_name):
         frame = self.frames[page_name]
         frame.tkraise()
+
+    def save_latex_question(self, sympy_expr):
+        self.shared_data["latex_question"] = sympy_expr
+
+    def save_parameters(self, parameters):
+        self.shared_data["parameters"] = parameters
 
 if __name__ == "__main__":
     app = BaseApp()

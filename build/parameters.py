@@ -1,6 +1,8 @@
 import tkinter as tk
 from pathlib import Path
 from tkinter import PhotoImage, Text
+import sympy as sp
+from sympy.parsing.latex import parse_latex
 
 class ParametersPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -54,8 +56,20 @@ class ParametersPage(tk.Frame):
 
         self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
 
+        # Storing the latex question and the parameters
+        self.latex_question = None
+        self.parameters_data = []
+
     def relative_to_assets(self, path: str) -> Path:
         return self.ASSETS_PATH / Path(path)
+
+    def convert_latex_to_sympy(self):
+        latex_input = self.entry_1.get("1.0", "end-1c")
+        try:
+            self.latex_question = parse_latex(latex_input) 
+            print(f"SymPy Expression: {self.latex_question}")
+        except Exception as e:
+            print(f"Error parsing LaTeX: {e}")
 
     def create_top_section(self):
         self.canvas.create_text(
@@ -109,35 +123,35 @@ class ParametersPage(tk.Frame):
         label = tk.Label(self.inner_frame, text=f"Param {self.param_count}:", bg="#F5F5F5", font=("Inter", 16 * -1))
         label.grid(row=self.param_count, column=0, padx=10, pady=5, sticky="w")
 
-        new_entry_2 = tk.Entry(self.inner_frame, width=6, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
-        new_entry_2.grid(row=self.param_count, column=1, padx=5)
+        self.entry_2 = tk.Entry(self.inner_frame, width=6, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        self.entry_2.grid(row=self.param_count, column=1, padx=5)
 
         tk.Label(self.inner_frame, text="from", bg="#F5F5F5", font=("Inter", 16 * -1)).grid(row=self.param_count, column=2, padx=5)
 
-        new_entry_3 = tk.Entry(self.inner_frame, width=10, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
-        new_entry_3.grid(row=self.param_count, column=3, padx=5)
+        self.entry_3 = tk.Entry(self.inner_frame, width=10, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        self.entry_3.grid(row=self.param_count, column=3, padx=5)
 
         tk.Label(self.inner_frame, text="to", bg="#F5F5F5", font=("Inter", 16 * -1)).grid(row=self.param_count, column=4, padx=5)
 
-        new_entry_4 = tk.Entry(self.inner_frame, width=10, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
-        new_entry_4.grid(row=self.param_count, column=5, padx=5)
+        self.entry_4 = tk.Entry(self.inner_frame, width=10, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        self.entry_4.grid(row=self.param_count, column=5, padx=5)
 
         tk.Label(self.inner_frame, text="excluding", bg="#F5F5F5", font=("Inter", 16 * -1)).grid(row=self.param_count, column=6, padx=5)
 
-        new_entry_5 = tk.Entry(self.inner_frame, width=15, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
-        new_entry_5.grid(row=self.param_count, column=7, padx=5)
+        self.entry_5 = tk.Entry(self.inner_frame, width=15, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        self.entry_5.grid(row=self.param_count, column=7, padx=5)
 
         tk.Label(self.inner_frame, text="with", bg="#F5F5F5", font=("Inter", 16 * -1)).grid(row=self.param_count, column=8, padx=5)
 
-        new_entry_6 = tk.Entry(self.inner_frame, width=15, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
-        new_entry_6.grid(row=self.param_count, column=9, padx=5)
+        self.entry_6 = tk.Entry(self.inner_frame, width=15, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        self.entry_6.grid(row=self.param_count, column=9, padx=5)
 
         new_placeholders = {
-            new_entry_2: "Name...",
-            new_entry_3: "Range...",
-            new_entry_4: "Range...",
-            new_entry_5: "Value...",
-            new_entry_6: "Step..."
+            self.entry_2: "Name...",
+            self.entry_3: "Range...",
+            self.entry_4: "Range...",
+            self.entry_5: "Value...",
+            self.entry_6: "Step..."
         }
 
         def on_focus_in(event):
@@ -161,8 +175,8 @@ class ParametersPage(tk.Frame):
             entry.bind("<FocusOut>", on_focus_out)
 
         self.param_count += 1
-
         self.update_scroll_region()
+
 
 
     def create_bottom_section(self):
@@ -184,7 +198,7 @@ class ParametersPage(tk.Frame):
             image=self.button_image_2,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: self.controller.show_frame("CorrectPage"),
+            command=self.on_next,
             relief="flat"
         )
         button_2.pack(side="right", padx=5, pady=10)
@@ -197,3 +211,23 @@ class ParametersPage(tk.Frame):
 
     def add_parameter(self):
         self.create_middle_section()
+
+    def on_next(self):
+        self.convert_latex_to_sympy()
+        print("SymPy Expression:", self.latex_question)
+        self.controller.save_latex_question(self.latex_question)
+
+        param_data = {
+            "name": self.entry_2.get(),
+            "range_from": self.entry_3.get(),
+            "range_to": self.entry_4.get(),
+            "excluding": self.entry_5.get(),
+            "step": self.entry_6.get(),
+        }
+        self.parameters_data.append(param_data)
+        print(f"Added parameter: {param_data}")
+
+        print("Parameters Data:", self.parameters_data)
+        self.controller.save_parameters(self.parameters_data)
+        
+        self.controller.show_frame("CorrectPage")
