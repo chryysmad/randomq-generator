@@ -67,10 +67,12 @@ class CorrectPage(tk.Frame):
                 entry_1.config(state="disabled", fg="#C0C0C0")
                 if entry_1.get() == "":
                     entry_1.insert(0, placeholders[entry_1])
+                self.function_sympy = None
             else:
                 entry_1.config(state="normal", fg="#C0C0C0")
                 if entry_1.get() == placeholders[entry_1]:
                     entry_1.config(fg="#C0C0C0")
+                self.function_sympy = sympify(entry_1.get())  
 
         radio_auto = tk.Radiobutton(
             self,
@@ -159,9 +161,11 @@ class CorrectPage(tk.Frame):
             print(f"Error converting LaTeX to SymPy: {e}")
 
     def go_to_next_page(self):
+        answer_mode = self.radio_value.get()
+    
         correct_answer_data = {
-            "answer_mode": self.radio_value.get(),  # Access the instance variable
-            "function": self.function_sympy if self.function_sympy else None
+            "answer_mode": answer_mode,
+            "function": self.function_sympy if answer_mode == "function" else None 
         }
 
         self.controller.shared_data["correct_answer"] = correct_answer_data

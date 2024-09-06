@@ -2,12 +2,15 @@ from pathlib import Path
 import tkinter as tk 
 from tkinter import Tk, Canvas, Entry, Button, PhotoImage
 from build.intro import IntroPage
+from backend.logic import Logic
 
 class RandomizerPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
         self.configure(bg="#F5F5F5")
+
+        self.logic = Logic(self.controller)
 
         self.randomization_count = 0 
 
@@ -110,4 +113,5 @@ class RandomizerPage(tk.Frame):
 
         print("Randomization count:", self.controller.shared_data["randomization_count"])
 
+        self.logic.perform_logic()
         self.controller.show_frame("IntroPage") 
