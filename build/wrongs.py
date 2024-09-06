@@ -160,6 +160,10 @@ class WrongsPage(tk.Frame):
         self.visible_options += 1
         self.update_scroll_region()
 
+    def collect_wrong_answers(self):
+        self.controller.shared_data["wrong_answers"] = self.wrong_answers
+        self.controller.shared_data["answer_number"] = self.answer_number
+
     def process_entries_and_continue(self):
         self.wrong_answers.clear()
 
@@ -181,7 +185,9 @@ class WrongsPage(tk.Frame):
         except ValueError:
             self.answer_number = 0  
 
-        print(f"Wrong Answers: {self.wrong_answers}")
-        print(f"Number of wrong answers to display: {self.answer_number}")
+        self.collect_wrong_answers()
+
+        print("Wrong A:", self.controller.shared_data["wrong_answers"])
+        print("Answer N:", self.controller.shared_data["answer_number"])
 
         self.controller.show_frame("RandomizerPage")

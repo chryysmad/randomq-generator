@@ -1,7 +1,7 @@
 from pathlib import Path
 import tkinter as tk 
 from tkinter import Tk, Canvas, Entry, Button, PhotoImage
-
+from build.intro import IntroPage
 
 class RandomizerPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -97,10 +97,17 @@ class RandomizerPage(tk.Frame):
 
         self.canvas.pack()
 
+    def save_randomization_count(self):
+        self.controller.shared_data["randomization_count"] = self.randomization_count
+
     def process_randomization_count(self):
         try:
             self.randomization_count = int(self.entry_1.get().strip())
         except ValueError:
             self.randomization_count = 0
 
-        print(f"Number of times to randomize: {self.randomization_count}")
+        self.save_randomization_count()
+
+        print("Randomization count:", self.controller.shared_data["randomization_count"])
+
+        self.controller.show_frame("IntroPage") 

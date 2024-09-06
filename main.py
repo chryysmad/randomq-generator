@@ -12,7 +12,11 @@ class BaseApp(tk.Tk):
 
         self.shared_data = {
             "latex_question": None,
-            "parameters": []
+            "parameters": [], 
+            "correct_answer": None, 
+            "wrong_answers": [], 
+            "answer_number": None,
+            "randomization_count": 0
         }
 
         self.title("Random Question Generator")

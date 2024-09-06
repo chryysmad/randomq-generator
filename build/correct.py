@@ -57,24 +57,25 @@ class CorrectPage(tk.Frame):
             font=("Inter", 16 * -1)
         )
 
-        radio_value = tk.StringVar(value="auto")
+        # Make radio_value an instance variable (self.radio_value)
+        self.radio_value = tk.StringVar(value="auto")
 
         font_setting = ("Inter", 16 * -1)
 
         def update_entry_state():
-            if radio_value.get() == "auto":
-                entry_1.config(state="disabled", fg="#C0C0C0")  
+            if self.radio_value.get() == "auto":
+                entry_1.config(state="disabled", fg="#C0C0C0")
                 if entry_1.get() == "":
                     entry_1.insert(0, placeholders[entry_1])
             else:
                 entry_1.config(state="normal", fg="#C0C0C0")
                 if entry_1.get() == placeholders[entry_1]:
-                    entry_1.config(fg="#C0C0C0") 
+                    entry_1.config(fg="#C0C0C0")
 
         radio_auto = tk.Radiobutton(
             self,
             text="Auto Calculate",
-            variable=radio_value,
+            variable=self.radio_value,
             value="auto",
             bg="#F5F5F5",
             font=font_setting,
@@ -85,11 +86,11 @@ class CorrectPage(tk.Frame):
         radio_function = tk.Radiobutton(
             self,
             text="Function Calculation",
-            variable=radio_value,
+            variable=self.radio_value,
             value="function",
             bg="#F5F5F5",
             font=font_setting,
-            command=update_entry_state 
+            command=update_entry_state
         )
         radio_function.place(x=503.0, y=211.0)
 
@@ -118,10 +119,10 @@ class CorrectPage(tk.Frame):
                 if placeholder and entry.get() == placeholder:
                     entry.delete(0, "end")
                     entry.config(fg="#000716")
-            
+
         def on_focus_out(event):
             entry = event.widget
-            if entry.cget('state') == "normal":  
+            if entry.cget('state') == "normal":
                 placeholder = placeholders.get(entry)
                 if placeholder and entry.get() == "":
                     entry.insert(0, placeholder)
@@ -153,15 +154,23 @@ class CorrectPage(tk.Frame):
     def convert_latex_to_sympy(self, latex_str):
         try:
             self.function_sympy = parse_latex(latex_str)
-            print(f"Sympy Expression: {self.function_sympy}")  
 
         except Exception as e:
             print(f"Error converting LaTeX to SymPy: {e}")
 
     def go_to_next_page(self):
+        correct_answer_data = {
+            "answer_mode": self.radio_value.get(),  # Access the instance variable
+            "function": self.function_sympy if self.function_sympy else None
+        }
+
+        self.controller.shared_data["correct_answer"] = correct_answer_data
+        
+        print("Correct A:", self.controller.shared_data["correct_answer"])
+
         intro_page = self.controller.frames["IntroPage"]
         selected_option = intro_page.selected_option
-            
+
         if selected_option == "MCQ":
             self.controller.show_frame("WrongsPage")
         elif selected_option == "FIB":

@@ -68,7 +68,6 @@ class ParametersPage(tk.Frame):
         latex_input = self.entry_1.get("1.0", "end-1c")
         try:
             self.latex_question = parse_latex(latex_input) 
-            print(f"SymPy Expression: {self.latex_question}")
         except Exception as e:
             print(f"Error parsing LaTeX: {e}")
 
@@ -223,7 +222,6 @@ class ParametersPage(tk.Frame):
 
     def on_next(self):
         self.convert_latex_to_sympy()
-        print("SymPy Expression:", self.latex_question)
         self.controller.save_latex_question(self.latex_question)
 
         for param_frame in self.entries:
@@ -236,6 +234,9 @@ class ParametersPage(tk.Frame):
             }
             self.parameters_data.append(param_data)
 
-        print("Parameters Data:", self.parameters_data)
         self.controller.save_parameters(self.parameters_data)
+
+        print("Latex Q:", self.controller.shared_data.get("latex_question"))
+        print("Parameters:", self.controller.shared_data.get("parameters"))
+
         self.controller.show_frame("CorrectPage")
