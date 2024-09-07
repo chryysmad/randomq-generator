@@ -111,7 +111,5 @@ class RandomizerPage(tk.Frame):
 
         self.save_randomization_count()
 
-        print("Randomization count:", self.controller.shared_data["randomization_count"])
-
         self.logic.perform_logic()
         self.controller.show_frame("IntroPage") 

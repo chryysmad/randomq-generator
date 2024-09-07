@@ -186,8 +186,4 @@ class WrongsPage(tk.Frame):
             self.answer_number = 0  
 
         self.collect_wrong_answers()
-
-        print("Wrong A:", self.controller.shared_data["wrong_answers"])
-        print("Answer N:", self.controller.shared_data["answer_number"])
-
         self.controller.show_frame("RandomizerPage")

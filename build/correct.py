@@ -169,8 +169,6 @@ class CorrectPage(tk.Frame):
         }
 
         self.controller.shared_data["correct_answer"] = correct_answer_data
-        
-        print("Correct A:", self.controller.shared_data["correct_answer"])
 
         intro_page = self.controller.frames["IntroPage"]
         selected_option = intro_page.selected_option

@@ -235,8 +235,4 @@ class ParametersPage(tk.Frame):
             self.parameters_data.append(param_data)
 
         self.controller.save_parameters(self.parameters_data)
-
-        print("Latex Q:", self.controller.shared_data.get("latex_question"))
-        print("Parameters:", self.controller.shared_data.get("parameters"))
-
         self.controller.show_frame("CorrectPage")
