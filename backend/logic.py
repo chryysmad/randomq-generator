@@ -40,8 +40,11 @@ class Logic:
             else:
                 expr = sp.sympify(latex_question)
                 correct_value = expr.subs(randomized_params)
-                
-            correct_answer_latex = sp.latex(correct_value)
+
+            print(f"Correct value: {correct_value}")
+            evaluated_value = correct_value.evalf()
+            print(f"Evaluated value: {evaluated_value}")
+            correct_answer_latex = sp.latex(evaluated_value)
 
 
             # select wrong answers
