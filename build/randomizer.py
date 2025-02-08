@@ -48,18 +48,13 @@ class RandomizerPage(tk.Frame):
         )
 
         self.canvas.create_text(
-            330.0, 245.0,
+            200.0, 245.0,
             anchor="nw",
             text="Number of times:",
             fill="#1E1E1E",
             font=("Inter", 16 * -1)
         )
 
-        self.entry_image_1 = tk.PhotoImage(file=relative_to_assets("entry_1.png"))
-        self.canvas.create_image(
-            573.0, 255.5,
-            image=self.entry_image_1
-        )
         self.entry_1 = tk.Entry(self, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
         self.entry_1.place(x=491.0, y=237.0, width=164.0, height=35.0)
 
