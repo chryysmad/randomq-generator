@@ -20,6 +20,7 @@ class BaseApp(tk.Tk):
         }
 
         self.title("Random Question Generator")
+        self.resizable(True, True)
         self.geometry("994x547")
         self.configure(bg="#F5F5F5")
 
