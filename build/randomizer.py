@@ -15,7 +15,7 @@ class RandomizerPage(tk.Frame):
         self.randomization_count = 0 
 
         OUTPUT_PATH = Path(__file__).parent
-        ASSETS_PATH = OUTPUT_PATH / Path(r"/home/chrysmad/randomq-generator/build/assets/frame0")
+        ASSETS_PATH = OUTPUT_PATH / Path(r"./assets/frame0")
 
         def relative_to_assets(path: str) -> Path:
             return ASSETS_PATH / Path(path)

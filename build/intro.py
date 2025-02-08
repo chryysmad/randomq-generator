@@ -69,7 +69,7 @@ class IntroPage(tk.Frame):
 
     def relative_to_assets(self, path: str):
         OUTPUT_PATH = Path(__file__).parent
-        ASSETS_PATH = OUTPUT_PATH / Path(r"/home/chrysmad/randomq-generator/build/assets/frame4")
+        ASSETS_PATH = OUTPUT_PATH / Path(r"./assets/frame4")
         return ASSETS_PATH / Path(path)
 
     def set_option(self, option):

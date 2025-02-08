@@ -11,7 +11,7 @@ class ParametersPage(tk.Frame):
         self.configure(bg="#F5F5F5")
 
         OUTPUT_PATH = Path(__file__).parent
-        self.ASSETS_PATH = OUTPUT_PATH / Path(r"/home/chrysmad/randomq-generator/build/assets/frame3")
+        self.ASSETS_PATH = OUTPUT_PATH / Path(r"./assets/frame3")
 
         self.param_count = 1
         self.placeholders = {}

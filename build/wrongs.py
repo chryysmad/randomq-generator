@@ -43,7 +43,7 @@ class WrongsPage(tk.Frame):
         self.create_bottom_section()
 
     def relative_to_assets(self, path: str) -> Path:
-        ASSETS_PATH = Path(__file__).parent / Path(r"/home/chrysmad/randomq-generator/build/assets/frame1")
+        ASSETS_PATH = Path(__file__).parent / Path(r"./assets/frame1")
         return ASSETS_PATH / Path(path)
 
     def create_top_section(self):

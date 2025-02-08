@@ -15,7 +15,7 @@ class CorrectPage(tk.Frame):
         self.function_sympy = None
 
         OUTPUT_PATH = Path(__file__).parent
-        ASSETS_PATH = OUTPUT_PATH / Path(r"/home/chrysmad/randomq-generator/build/assets/frame2")
+        ASSETS_PATH = OUTPUT_PATH / Path(r"./assets/frame2")
 
         def relative_to_assets(path: str) -> Path:
             return ASSETS_PATH / Path(path)
