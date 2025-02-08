@@ -3,6 +3,7 @@ from pathlib import Path
 from tkinter import PhotoImage, Text
 import sympy as sp
 from sympy.parsing.latex import parse_latex
+from PIL import Image, ImageTk
 
 class ParametersPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -130,77 +131,81 @@ class ParametersPage(tk.Frame):
         self.entry_1.config(fg="#C0C0C0")
 
     def create_middle_section(self):
+        param_id = self.param_count
         param_frame = {}
 
+        # container frame for the entire row.
+        row_frame = tk.Frame(self.inner_frame, bg="#F5F5F5")
+        row_frame.grid(row=param_id, column=0, columnspan=11, sticky="w", pady=2)
+        param_frame['row_frame'] = row_frame
+
         label = tk.Label(
-            self.inner_frame,
-            text=f"Param {self.param_count}:",
+            row_frame,
+            text=f"Param {param_id}:",
             bg="#F5F5F5",
             font=("Inter", 16 * -1)
         )
-        label.grid(row=self.param_count, column=0, padx=10, pady=5, sticky="w")
+        label.grid(row=0, column=0, padx=10, pady=5, sticky="w")
 
-        self.entry_2 = tk.Entry(
-            self.inner_frame, width=6, bd=0, bg="#FFFFFF",
-            fg="#000716", highlightthickness=0
-        )
-        self.entry_2.grid(row=self.param_count, column=1, padx=5)
-        param_frame['name'] = self.entry_2
+        entry_name = tk.Entry(row_frame, width=6, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        entry_name.grid(row=0, column=1, padx=5)
+        param_frame['name'] = entry_name
 
-        tk.Label(
-            self.inner_frame, text="from", bg="#F5F5F5",
-            font=("Inter", 16 * -1)
-        ).grid(row=self.param_count, column=2, padx=5)
+        tk.Label(row_frame, text="from", bg="#F5F5F5", font=("Inter", 16 * -1)).grid(row=0, column=2, padx=5)
 
-        self.entry_3 = tk.Entry(
-            self.inner_frame, width=10, bd=0, bg="#FFFFFF",
-            fg="#000716", highlightthickness=0
-        )
-        self.entry_3.grid(row=self.param_count, column=3, padx=5)
-        param_frame['range_from'] = self.entry_3
+        entry_from = tk.Entry(row_frame, width=10, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        entry_from.grid(row=0, column=3, padx=5)
+        param_frame['range_from'] = entry_from
 
-        tk.Label(
-            self.inner_frame, text="to", bg="#F5F5F5",
-            font=("Inter", 16 * -1)
-        ).grid(row=self.param_count, column=4, padx=5)
+        tk.Label(row_frame, text="to", bg="#F5F5F5", font=("Inter", 16 * -1)).grid(row=0, column=4, padx=5)
 
-        self.entry_4 = tk.Entry(
-            self.inner_frame, width=10, bd=0, bg="#FFFFFF",
-            fg="#000716", highlightthickness=0
-        )
-        self.entry_4.grid(row=self.param_count, column=5, padx=5)
-        param_frame['range_to'] = self.entry_4
+        entry_to = tk.Entry(row_frame, width=10, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        entry_to.grid(row=0, column=5, padx=5)
+        param_frame['range_to'] = entry_to
 
-        tk.Label(
-            self.inner_frame, text="excluding", bg="#F5F5F5",
-            font=("Inter", 16 * -1)
-        ).grid(row=self.param_count, column=6, padx=5)
+        tk.Label(row_frame, text="excluding", bg="#F5F5F5", font=("Inter", 16 * -1)).grid(row=0, column=6, padx=5)
 
-        self.entry_5 = tk.Entry(
-            self.inner_frame, width=15, bd=0, bg="#FFFFFF",
-            fg="#000716", highlightthickness=0
-        )
-        self.entry_5.grid(row=self.param_count, column=7, padx=5)
-        param_frame['excluding'] = self.entry_5
+        entry_excluding = tk.Entry(row_frame, width=15, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        entry_excluding.grid(row=0, column=7, padx=5)
+        param_frame['excluding'] = entry_excluding
 
-        tk.Label(
-            self.inner_frame, text="with", bg="#F5F5F5",
-            font=("Inter", 16 * -1)
-        ).grid(row=self.param_count, column=8, padx=5)
+        tk.Label(row_frame, text="with", bg="#F5F5F5", font=("Inter", 16 * -1)).grid(row=0, column=8, padx=5)
 
-        self.entry_6 = tk.Entry(
-            self.inner_frame, width=15, bd=0, bg="#FFFFFF",
-            fg="#000716", highlightthickness=0
-        )
-        self.entry_6.grid(row=self.param_count, column=9, padx=5)
-        param_frame['step'] = self.entry_6
+        entry_step = tk.Entry(row_frame, width=15, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        entry_step.grid(row=0, column=9, padx=5)
+        param_frame['step'] = entry_step
+
+        if self.param_count > 1:
+            trash_bin_path = self.relative_to_assets("trash_bin.png")
+            trash_bin_image = Image.open(trash_bin_path)
+            desired_width = 20
+            desired_height = 20
+            trash_bin_image = trash_bin_image.resize((desired_width, desired_height), Image.Resampling.LANCZOS)
+            trash_bin_photo = ImageTk.PhotoImage(trash_bin_image)
+
+            trash_button_frame = tk.Frame(row_frame, width=desired_width + 10, height=desired_height + 10, bg="#F5F5F5")
+            trash_button_frame.grid_propagate(False)
+            trash_button_frame.grid(row=0, column=10, padx=5, pady=2)
+
+            trash_button = tk.Button(
+                trash_button_frame,
+                image=trash_bin_photo,
+                borderwidth=0,
+                highlightthickness=0,
+                relief="flat",
+                command=lambda: self.delete_parameter(param_frame)
+            )
+            trash_button.image = trash_bin_photo 
+            trash_button.pack(expand=True)
+            param_frame['trash_button_frame'] = trash_button_frame
+
 
         new_placeholders = {
-            self.entry_2: "Name...",
-            self.entry_3: "Range...",
-            self.entry_4: "Range...",
-            self.entry_5: "Value...",
-            self.entry_6: "Step..."
+            entry_name: "Name...",
+            entry_from: "Range...",
+            entry_to: "Range...",
+            entry_excluding: "Value...",
+            entry_step: "Step..."
         }
 
         def on_focus_in(event):
@@ -274,3 +279,24 @@ class ParametersPage(tk.Frame):
 
         self.controller.save_parameters(self.parameters_data)
         self.controller.show_frame("CorrectPage")
+
+    def delete_parameter(self, param_frame):
+        if self.entries and self.entries[0] == param_frame:
+            return
+
+        row_frame = param_frame.get('row_frame')
+        if row_frame:
+            row_frame.destroy()
+
+        if param_frame in self.entries:
+            self.entries.remove(param_frame)
+            self.param_count -= 1
+
+        for new_id, p in enumerate(self.entries, start=1):
+            row = p.get('row_frame')
+            if row:
+                row.grid_configure(row=new_id)
+
+        self.update_scroll_region()
+
+
