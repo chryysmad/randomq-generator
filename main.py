@@ -21,7 +21,7 @@ class BaseApp(tk.Tk):
 
         self.title("Random Question Generator")
         self.resizable(True, True)
-        self.geometry("994x547")
+        self.geometry("1280x900")
         self.configure(bg="#F5F5F5")
 
         # make a container that stores all the pages
