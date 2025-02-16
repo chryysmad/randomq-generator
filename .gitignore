@@ -3,4 +3,4 @@ __pycache__/
 .venv/
 .myvenv/
 *.json
-*.txt
+output.txt
