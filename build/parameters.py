@@ -4,6 +4,7 @@ from tkinter import PhotoImage, Text
 import sympy as sp
 from sympy.parsing.latex import parse_latex
 from PIL import Image, ImageTk
+import backend.util as util
 
 class ParametersPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -80,7 +81,7 @@ class ParametersPage(tk.Frame):
         try:
             self.latex_question = parse_latex(latex_input) 
         except Exception as e:
-            print(f"Error parsing LaTeX: {e}")
+            util.logger.error(f"Error parsing LaTeX: {e}")
 
     def create_top_section(self):
         self.top_canvas.create_text(

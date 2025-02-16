@@ -5,6 +5,7 @@ from sympy.parsing.latex import parse_latex
 from sympy import sympify, Symbol
 from build.wrongs import WrongsPage
 from build.randomizer import RandomizerPage
+import backend.util as util
 
 class CorrectPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -158,7 +159,7 @@ class CorrectPage(tk.Frame):
             self.function_sympy = parse_latex(latex_str)
 
         except Exception as e:
-            print(f"Error converting LaTeX to SymPy: {e}")
+            util.logger.error(f"Error converting LaTeX to SymPy: {e}")
 
     def go_to_next_page(self):
         answer_mode = self.radio_value.get()

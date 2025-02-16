@@ -6,7 +6,7 @@
 from pathlib import Path
 import tkinter as tk
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
-
+import backend.util as util
 
 class IntroPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -74,7 +74,7 @@ class IntroPage(tk.Frame):
 
     def set_option(self, option):
         self.selected_option = option
-        print(f"Selected option: {option}")
+        util.logger.info(f"Selected option: {option}")
         self.controller.show_frame("ParametersPage")
 
     

@@ -1,0 +1,74 @@
+[
+    {
+        "randomized_params": {
+            "a": 12,
+            "b": 6
+        },
+        "correct_answer": "0.5",
+        "correct_formula": "\\frac{b}{a}",
+        "wrong_answers": [
+            "2.0",
+            "6.0",
+            "String option"
+        ],
+        "wrong_formulas": [
+            "\\frac{a}{b}",
+            "a - b",
+            "String option"
+        ]
+    },
+    {
+        "randomized_params": {
+            "a": 52,
+            "b": 27
+        },
+        "correct_answer": "0.519230769230769",
+        "correct_formula": "\\frac{b}{a}",
+        "wrong_answers": [
+            "String option",
+            "1.92592592592593",
+            "25.0"
+        ],
+        "wrong_formulas": [
+            "String option",
+            "\\frac{a}{b}",
+            "a - b"
+        ]
+    },
+    {
+        "randomized_params": {
+            "a": 86,
+            "b": 45
+        },
+        "correct_answer": "0.523255813953488",
+        "correct_formula": "\\frac{b}{a}",
+        "wrong_answers": [
+            "41.0",
+            "1.91111111111111",
+            "String option"
+        ],
+        "wrong_formulas": [
+            "a - b",
+            "\\frac{a}{b}",
+            "String option"
+        ]
+    },
+    {
+        "randomized_params": {
+            "a": 32,
+            "b": 18
+        },
+        "correct_answer": "0.5625",
+        "correct_formula": "\\frac{b}{a}",
+        "wrong_answers": [
+            "1.77777777777778",
+            "14.0",
+            "String option"
+        ],
+        "wrong_formulas": [
+            "\\frac{a}{b}",
+            "a - b",
+            "String option"
+        ]
+    }
+]
