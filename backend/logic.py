@@ -7,6 +7,7 @@ class Logic:
 
     def perform_logic(self):
         shared_data = self.controller.shared_data
+        print(shared_data)
 
         latex_question = shared_data.get("latex_question")
         parameters = shared_data.get("parameters")
