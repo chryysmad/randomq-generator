@@ -90,7 +90,8 @@ class WrongsPage(tk.Frame):
             self.bottom_frame,
             text=(
                 "Specify how many of the wrong generated answers you want to be displayed "
-                "to the student (Suggestion: 3)"
+                "to the student (Suggestion: 3). The number should be less than or equal "
+                "to the number of options provided above."
             ),
             bg="#F5F5F5",
             fg="#757575",
@@ -109,38 +110,20 @@ class WrongsPage(tk.Frame):
         )
         number_label.pack(side="left", padx=(10, 0))
 
-        self.answer_number_entry = tk.Entry(
+        self.answer_number_var = tk.StringVar(value="1")
+        self.answer_number_spinbox = tk.Spinbox(
             self.bottom_frame,
+            from_=1,
+            to=(len(self.entries) if self.entries else 1),
+            width=5,
             bd=0,
             bg="#FFFFFF",
             fg="#000716",
-            highlightthickness=0
+            font=("Inter", 16 * -1),
+            textvariable=self.answer_number_var,
+            state="readonly"
         )
-        self.answer_number_entry.pack(side="left", padx=(10, 0), pady=10, fill="x", expand=True)
-
-        placeholders = {
-            self.answer_number_entry: "Enter a value here..."
-        }
-
-        def on_focus_in(event):
-            entry = event.widget
-            placeholder = placeholders.get(entry)
-            if placeholder and entry.get() == placeholder:
-                entry.delete(0, "end")
-                entry.config(fg="#000716")
-
-        def on_focus_out(event):
-            entry = event.widget
-            placeholder = placeholders.get(entry)
-            if placeholder and entry.get() == "":
-                entry.insert(0, placeholder)
-                entry.config(fg="#C0C0C0")
-
-        for entry in placeholders.keys():
-            entry.insert(0, placeholders[entry])
-            entry.config(fg="#C0C0C0")
-            entry.bind("<FocusIn>", on_focus_in)
-            entry.bind("<FocusOut>", on_focus_out)
+        self.answer_number_spinbox.pack(side="left", padx=(10, 0), pady=10)
 
         button_2_img = PhotoImage(file=self.relative_to_assets("button_2.png"))
         button_2 = tk.Button(
@@ -157,6 +140,19 @@ class WrongsPage(tk.Frame):
 
     def update_scroll_region(self, event=None):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+        if hasattr(self, 'answer_number_spinbox'):
+            new_max = len(self.entries) if len(self.entries) > 0 else 1
+            self.answer_number_spinbox.config(to=new_max)
+            try:
+                current_val = int(self.answer_number_spinbox.get())
+            except ValueError:
+                current_val = 1
+            if current_val > new_max:
+                self.answer_number_spinbox.config(state="normal")
+                self.answer_number_spinbox.delete(0, tk.END)
+                self.answer_number_spinbox.insert(0, str(new_max))
+                self.answer_number_spinbox.config(state="readonly")
 
     def add_entry_field(self):
         grid_row = len(self.entries) + 1
@@ -192,14 +188,12 @@ class WrongsPage(tk.Frame):
             if placeholder and w.get() == placeholder:
                 w.delete(0, "end")
                 w.config(fg="#000716")
-
         def on_focus_out(event):
             w = event.widget
             placeholder = new_placeholders.get(w)
             if placeholder and w.get() == "":
                 w.insert(0, placeholder)
                 w.config(fg="#C0C0C0")
-
         entry.insert(0, new_placeholders[entry])
         entry.config(fg="#C0C0C0")
         entry.bind("<FocusIn>", on_focus_in)
@@ -234,6 +228,7 @@ class WrongsPage(tk.Frame):
             'label_num': label_num  
         }
         self.entries.append(option_frame)
+        self.update_scroll_region()
 
     def show_next_entry_field(self):
         self.add_entry_field()
@@ -241,15 +236,16 @@ class WrongsPage(tk.Frame):
 
     def collect_wrong_answers(self):
         self.controller.shared_data["wrong_answers"] = self.wrong_answers
+        try:
+            self.answer_number = int(self.answer_number_spinbox.get())
+        except ValueError:
+            self.answer_number = 0
         self.controller.shared_data["answer_number"] = self.answer_number
 
     def process_entries_and_continue(self):
         self.wrong_answers.clear()
-
         for option_frame in self.entries:
             text = option_frame['entry'].get().strip()
-
-            # if it's a "t:" or "f:" type
             if text.startswith("t:"):
                 self.wrong_answers.append(text[2:].strip())
             elif text.startswith("f:"):
@@ -261,14 +257,7 @@ class WrongsPage(tk.Frame):
                     util.logger.error(f"Error parsing LaTeX: {e}")
                     self.wrong_answers.append(None)
             else:
-                # if there's no prefix, treat it as plain text
                 self.wrong_answers.append(text)
-
-        try:
-            self.answer_number = int(self.answer_number_entry.get().strip())
-        except ValueError:
-            self.answer_number = 0  
-
         self.collect_wrong_answers()
         self.controller.show_frame("RandomizerPage")
 
@@ -276,11 +265,8 @@ class WrongsPage(tk.Frame):
         row_frame = option_frame.get('row_frame')
         if row_frame:
             row_frame.destroy()
-
         if option_frame in self.entries:
             self.entries.remove(option_frame)
-
         for new_index, frame_dict in enumerate(self.entries, start=1):
             frame_dict['row_frame'].grid_configure(row=new_index)
-
         self.update_scroll_region()
