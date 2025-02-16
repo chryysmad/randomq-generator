@@ -193,6 +193,7 @@ class WrongsPage(tk.Frame):
         )
         entry.grid(row=0, column=1, padx=5)
 
+
         new_placeholders = {entry: "Enter the string or function here..."}
         def on_focus_in(event):
             w = event.widget
