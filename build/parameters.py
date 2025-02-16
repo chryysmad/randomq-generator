@@ -5,6 +5,7 @@ import sympy as sp
 from sympy.parsing.latex import parse_latex
 from PIL import Image, ImageTk
 import backend.util as util
+import sympy as sp
 
 class ParametersPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -79,7 +80,7 @@ class ParametersPage(tk.Frame):
     def convert_latex_to_sympy(self):
         latex_input = self.entry_1.get("1.0", "end-1c")
         try:
-            self.latex_question = parse_latex(latex_input) 
+            self.latex_question = sp.sympify(parse_latex(latex_input))
         except Exception as e:
             util.logger.error(f"Error parsing LaTeX: {e}")
 
