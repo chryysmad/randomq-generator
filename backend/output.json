@@ -1,0 +1,50 @@
+[
+    {
+        "randomized_params": {
+            "a": 42,
+            "b": 43
+        },
+        "correct_answer": "1.02380952380952",
+        "wrong_answers": [
+            -1,
+            "String option",
+            "42/43"
+        ]
+    },
+    {
+        "randomized_params": {
+            "a": 34,
+            "b": 44
+        },
+        "correct_answer": "1.29411764705882",
+        "wrong_answers": [
+            "17/22",
+            "String option",
+            -10
+        ]
+    },
+    {
+        "randomized_params": {
+            "a": 70,
+            "b": 20
+        },
+        "correct_answer": "0.285714285714286",
+        "wrong_answers": [
+            50,
+            "7/2",
+            "String option"
+        ]
+    },
+    {
+        "randomized_params": {
+            "a": 60,
+            "b": 21
+        },
+        "correct_answer": "0.35",
+        "wrong_answers": [
+            "String option",
+            39,
+            "20/7"
+        ]
+    }
+]

@@ -1,13 +1,33 @@
 import random
 import sympy as sp
+import json
+
+try:
+    import backend.util as util
+except ModuleNotFoundError:
+    import util
 
 class Logic:
-    def __init__(self, controller):
-        self.controller = controller
+    def __init__(self):
+        self.path_to_output = 'output.json'
 
-    def perform_logic(self):
-        shared_data = self.controller.shared_data
-        print(shared_data)
+
+    def save_to_file(self, data):
+        def default_converter(obj):
+            if isinstance(obj, sp.Integer):
+                return int(obj)
+            elif isinstance(obj, sp.Rational):
+                fraction_str = f"{obj.p}/{obj.q}"
+                return fraction_str
+            return str(obj)
+        
+        with open(self.path_to_output, 'w') as f:
+            json.dump(data, f, indent=4, default=default_converter)
+        
+
+    def perform_logic(self, data):
+        shared_data = data
+        
 
         latex_question = shared_data.get("latex_question")
         parameters = shared_data.get("parameters")
@@ -15,9 +35,6 @@ class Logic:
         wrong_answers = shared_data.get("wrong_answers")
         answer_number = shared_data.get("answer_number")
         randomization_count = shared_data.get("randomization_count")
-
-        param_symbols = {param['name']: sp.symbols(param['name']) for param in parameters}
-        x = sp.symbols('x') 
 
         random_questions = []
         for _ in range(randomization_count):
@@ -34,6 +51,7 @@ class Logic:
                 randomized_value = random.choice(param_values)
                 randomized_params[param_name] = randomized_value
 
+            
             # calculate the correct answer based on answer_mode
             if correct_answer['answer_mode'] == 'function':
                 correct_answer_func = correct_answer['function']
@@ -42,11 +60,11 @@ class Logic:
                 expr = sp.sympify(latex_question)
                 correct_value = expr.subs(randomized_params)
 
-            print(f"Correct value: {correct_value}")
             evaluated_value = correct_value.evalf()
-            print(f"Evaluated value: {evaluated_value}")
             correct_answer_latex = sp.latex(evaluated_value)
 
+            util.logger.info(f"Correct value: {correct_value}")
+            util.logger.info(f"Evaluated value: {evaluated_value}")
 
             # select wrong answers
             selected_wrong_answers = []
@@ -65,5 +83,50 @@ class Logic:
                 'wrong_answers': final_wrong_answers
             })
 
-        print(random_questions)
+        # Should output the random questions to a specified file
+        # with open(self.path_to_output, 'w') as f:
+        #     json.dump(random_questions, f, indent=4)
+        self.save_to_file(random_questions)
         return random_questions
+    
+if __name__ == "__main__":
+    logic = Logic()
+
+    # Emulate shared_data with the specified values:
+    data = {
+        "latex_question": "Eq(a*x, b)",
+        "parameters": [
+            {
+                "name": "a",
+                "range_from": "0",
+                "range_to": "100",
+                "excluding": "0",
+                "step": "2"
+            },
+            {
+                "name": "b",
+                "range_from": "0",
+                "range_to": "50",
+                "excluding": "1",
+                "step": "1"
+            }
+        ],
+        # The correct answer is x = b/a (as a sympy expression)
+        "correct_answer": {
+            "answer_mode": "function",
+            "function": sp.sympify("b/a")
+        },
+        # Provide three wrong answer options (mix of sympy expressions and strings)
+        "wrong_answers": [
+            sp.sympify("a/b"),    # wrong: reciprocal of b/a
+            sp.sympify("a - b"),   # wrong: difference between a and b
+            "String option"           # a string option
+        ],
+        "answer_number": 3,
+        "randomization_count": 4
+    }
+
+    # Run the logic to generate questions and output to output.json
+    questions = logic.perform_logic(data)
+    
+
