@@ -2,6 +2,7 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import PhotoImage
 from sympy.parsing.latex import parse_latex 
+from PIL import Image, ImageTk
 
 class WrongsPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -17,7 +18,6 @@ class WrongsPage(tk.Frame):
         # Top section: Non-scrollable
         self.top_frame = tk.Frame(self, bg="#F5F5F5")
         self.top_frame.pack(side="top", fill="x")
-
         self.create_top_section()
 
         # Middle section: Scrollable (this is where options will be added)
@@ -39,6 +39,7 @@ class WrongsPage(tk.Frame):
         self.bottom_frame = tk.Frame(self, bg="#F5F5F5")
         self.bottom_frame.pack(side="bottom", fill="x")
 
+        # Create the first option row
         self.create_middle_section()
         self.create_bottom_section()
 
@@ -47,14 +48,32 @@ class WrongsPage(tk.Frame):
         return ASSETS_PATH / Path(path)
 
     def create_top_section(self):
-        label = tk.Label(self.top_frame, text="Wrong Answers", bg="#F5F5F5", fg="#1E1E1E", font=("Inter", 20 * -1))
+        label = tk.Label(
+            self.top_frame, 
+            text="Wrong Answers", 
+            bg="#F5F5F5", 
+            fg="#1E1E1E", 
+            font=("Inter", 20 * -1)
+        )
         label.pack(anchor="nw", padx=10, pady=10)
 
-        description = tk.Label(self.top_frame, text="Here you can set either the answer text (t:) to be parsed as a string or the answer function (f:) in terms of the parameters given in the previous page to calculate the wrong answer option.",
-                               bg="#F5F5F5", fg="#757575", font=("Inter", 16 * -1), wraplength=800, justify="left")
+        description = tk.Label(
+            self.top_frame,
+            text=(
+                "Here you can set either the answer text (t:) to be parsed as a string or the answer "
+                "function (f:) in terms of the parameters given in the previous page to calculate "
+                "the wrong answer option."
+            ),
+            bg="#F5F5F5", 
+            fg="#757575", 
+            font=("Inter", 16 * -1), 
+            wraplength=800, 
+            justify="left"
+        )
         description.pack(anchor="nw", padx=10)
 
     def create_middle_section(self):
+        # Create the first row by default
         self.add_entry_field(1)
 
     def create_bottom_section(self):
@@ -71,14 +90,36 @@ class WrongsPage(tk.Frame):
         button_1.image = button_1_img 
         button_1.pack(pady=5)
 
-        number_label_info = tk.Label(self.bottom_frame, text="Specify how many of the wrong generated answers you want to be displayed to the student (Suggestion: 3)",
-                                     bg="#F5F5F5", fg="#757575", font=("Inter", 14 * -1), wraplength=800, justify="left")
+        number_label_info = tk.Label(
+            self.bottom_frame,
+            text=(
+                "Specify how many of the wrong generated answers you want to be displayed "
+                "to the student (Suggestion: 3)"
+            ),
+            bg="#F5F5F5",
+            fg="#757575",
+            font=("Inter", 14 * -1),
+            wraplength=800,
+            justify="left"
+        )
         number_label_info.pack(anchor="w", padx=10, pady=(5, 0))
 
-        number_label = tk.Label(self.bottom_frame, text="Number:", bg="#F5F5F5", fg="#1E1E1E", font=("Inter", 16 * -1))
+        number_label = tk.Label(
+            self.bottom_frame,
+            text="Number:",
+            bg="#F5F5F5",
+            fg="#1E1E1E",
+            font=("Inter", 16 * -1)
+        )
         number_label.pack(side="left", padx=(10, 0))
 
-        self.answer_number_entry = tk.Entry(self.bottom_frame, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        self.answer_number_entry = tk.Entry(
+            self.bottom_frame,
+            bd=0,
+            bg="#FFFFFF",
+            fg="#000716",
+            highlightthickness=0
+        )
         self.answer_number_entry.pack(side="left", padx=(10, 0), pady=10, fill="x", expand=True)
 
         placeholders = {
@@ -91,7 +132,7 @@ class WrongsPage(tk.Frame):
             if placeholder and entry.get() == placeholder:
                 entry.delete(0, "end")
                 entry.config(fg="#000716")
-            
+
         def on_focus_out(event):
             entry = event.widget
             placeholder = placeholders.get(entry)
@@ -122,37 +163,87 @@ class WrongsPage(tk.Frame):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
     def add_entry_field(self, index):
-        label = tk.Label(self.inner_frame, text=f"Option {index}:", bg="#F5F5F5", font=("Inter", 12))
-        entry = tk.Entry(self.inner_frame, width=50, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        """
+        Creates one "row" containing:
+          - A label "Option {index}:"
+          - An Entry
+          - A trash-bin button if index > 1
+        All inside row_frame, placed at (row=index) in inner_frame.
+        """
+        row_frame = tk.Frame(self.inner_frame, bg="#F5F5F5")
+        row_frame.grid(row=index, column=0, sticky="w", pady=2)
 
-        new_placeholders = {
-            entry: "Enter the string or function here..."
-        }
+        label = tk.Label(
+            row_frame, 
+            text=f"Option {index}:", 
+            bg="#F5F5F5", 
+            font=("Inter", 12)
+        )
+        label.grid(row=0, column=0, padx=10, pady=5, sticky="w")
 
+        entry = tk.Entry(
+            row_frame, 
+            width=50, 
+            bd=0, 
+            bg="#FFFFFF", 
+            fg="#000716", 
+            highlightthickness=0
+        )
+        entry.grid(row=0, column=1, padx=5)
+
+        # Placeholder handling for the entry
+        new_placeholders = {entry: "Enter the string or function here..."}
         def on_focus_in(event):
-            entry = event.widget
-            placeholder = new_placeholders.get(entry)
-            if placeholder and entry.get() == placeholder:
-                entry.delete(0, "end")
-                entry.config(fg="#000716")
+            w = event.widget
+            placeholder = new_placeholders.get(w)
+            if placeholder and w.get() == placeholder:
+                w.delete(0, "end")
+                w.config(fg="#000716")
 
         def on_focus_out(event):
-            entry = event.widget
-            placeholder = new_placeholders.get(entry)
-            if placeholder and entry.get() == "":
-                entry.insert(0, placeholder)
-                entry.config(fg="#C0C0C0")
+            w = event.widget
+            placeholder = new_placeholders.get(w)
+            if placeholder and w.get() == "":
+                w.insert(0, placeholder)
+                w.config(fg="#C0C0C0")
 
-        for entry, placeholder in new_placeholders.items():
-            entry.insert(0, placeholder)
-            entry.config(fg="#C0C0C0")
-            entry.bind("<FocusIn>", on_focus_in)
-            entry.bind("<FocusOut>", on_focus_out)
+        entry.insert(0, new_placeholders[entry])
+        entry.config(fg="#C0C0C0")
+        entry.bind("<FocusIn>", on_focus_in)
+        entry.bind("<FocusOut>", on_focus_out)
 
-        label.grid(row=index, column=0, padx=10, pady=5, sticky="w")
-        entry.grid(row=index, column=1, padx=5)
+        # Only show a trash bin for options after the first one
+        if index > 1:
+            trash_bin_path = self.relative_to_assets("trash_bin.png")
+            trash_bin_image = Image.open(trash_bin_path)
+            desired_width, desired_height = 20, 20
+            trash_bin_image = trash_bin_image.resize((desired_width, desired_height), Image.Resampling.LANCZOS)
+            trash_bin_photo = ImageTk.PhotoImage(trash_bin_image)
 
-        self.entries.append((label, entry))
+            # A small frame to hold the trash bin button
+            trash_button_frame = tk.Frame(row_frame, width=desired_width + 10, height=desired_height + 10, bg="#F5F5F5")
+            trash_button_frame.grid_propagate(False)
+            trash_button_frame.grid(row=0, column=2, padx=5, pady=2)
+
+            # Create the trash bin button
+            trash_button = tk.Button(
+                trash_button_frame,
+                image=trash_bin_photo,
+                borderwidth=0,
+                highlightthickness=0,
+                relief="flat",
+                command=lambda: self.delete_option(option_frame)
+            )
+            trash_button.image = trash_bin_photo  # Keep a reference
+            trash_button.pack(expand=True)
+
+        # Store references in a dictionary
+        option_frame = {
+            'row_frame': row_frame,
+            'label': label,
+            'entry': entry
+        }
+        self.entries.append(option_frame)
 
     def show_next_entry_field(self):
         index = self.visible_options + 1
@@ -167,8 +258,11 @@ class WrongsPage(tk.Frame):
     def process_entries_and_continue(self):
         self.wrong_answers.clear()
 
-        for label, entry in self.entries:
-            text = entry.get().strip()
+        # Access each entry from the dictionaries in self.entries
+        for option_frame in self.entries:
+            text = option_frame['entry'].get().strip()
+
+            # If it's a "t:" or "f:" type
             if text.startswith("t:"):
                 self.wrong_answers.append(text[2:].strip())
             elif text.startswith("f:"):
@@ -179,7 +273,11 @@ class WrongsPage(tk.Frame):
                 except Exception as e:
                     print(f"Error parsing LaTeX: {e}")
                     self.wrong_answers.append(None)
+            else:
+                # If there's no prefix, treat it as plain text or ignore
+                self.wrong_answers.append(text)
 
+        # Get the number of answers to show
         try:
             self.answer_number = int(self.answer_number_entry.get().strip())
         except ValueError:
@@ -187,3 +285,28 @@ class WrongsPage(tk.Frame):
 
         self.collect_wrong_answers()
         self.controller.show_frame("RandomizerPage")
+
+    def delete_option(self, option_frame):
+        """
+        Destroys the entire row (label, entry, trash button) for the given option_frame,
+        then reassigns row indices to the remaining rows.
+        """
+        # Do not allow deletion of the first row if that is your requirement
+        if self.entries and self.entries[0] == option_frame:
+            return
+
+        # Remove the row_frame from the UI
+        row_frame = option_frame.get('row_frame')
+        if row_frame:
+            row_frame.destroy()
+
+        # Remove this option from the entries list
+        if option_frame in self.entries:
+            self.entries.remove(option_frame)
+            self.visible_options -= 1
+
+        # Reconfigure row numbers for remaining options
+        for new_index, frame_dict in enumerate(self.entries, start=1):
+            frame_dict['row_frame'].grid_configure(row=new_index)
+
+        self.update_scroll_region()
