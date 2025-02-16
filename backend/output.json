@@ -1,74 +1,78 @@
 [
     {
+        "question_text": "Eq(a*x, b)",
         "randomized_params": {
-            "a": 12,
-            "b": 6
+            "a": 18,
+            "b": 48
         },
-        "correct_answer": "0.5",
+        "correct_answer": "2.66666666666667",
         "correct_formula": "\\frac{b}{a}",
         "wrong_answers": [
-            "2.0",
-            "6.0",
+            "-30.0",
+            "0.375",
             "String option"
         ],
         "wrong_formulas": [
-            "\\frac{a}{b}",
             "a - b",
+            "\\frac{a}{b}",
             "String option"
         ]
     },
     {
+        "question_text": "Eq(a*x, b)",
         "randomized_params": {
-            "a": 52,
-            "b": 27
+            "a": 54,
+            "b": 20
         },
-        "correct_answer": "0.519230769230769",
+        "correct_answer": "0.37037037037037",
         "correct_formula": "\\frac{b}{a}",
         "wrong_answers": [
             "String option",
-            "1.92592592592593",
-            "25.0"
+            "34.0",
+            "2.7"
         ],
         "wrong_formulas": [
             "String option",
-            "\\frac{a}{b}",
-            "a - b"
+            "a - b",
+            "\\frac{a}{b}"
         ]
     },
     {
+        "question_text": "Eq(a*x, b)",
         "randomized_params": {
-            "a": 86,
-            "b": 45
+            "a": 6,
+            "b": 8
         },
-        "correct_answer": "0.523255813953488",
+        "correct_answer": "1.33333333333333",
         "correct_formula": "\\frac{b}{a}",
         "wrong_answers": [
-            "41.0",
-            "1.91111111111111",
-            "String option"
+            "String option",
+            "-2.0",
+            "0.75"
         ],
         "wrong_formulas": [
+            "String option",
             "a - b",
-            "\\frac{a}{b}",
-            "String option"
+            "\\frac{a}{b}"
         ]
     },
     {
+        "question_text": "Eq(a*x, b)",
         "randomized_params": {
-            "a": 32,
-            "b": 18
+            "a": 68,
+            "b": 37
         },
-        "correct_answer": "0.5625",
+        "correct_answer": "0.544117647058823",
         "correct_formula": "\\frac{b}{a}",
         "wrong_answers": [
-            "1.77777777777778",
-            "14.0",
-            "String option"
+            "31.0",
+            "String option",
+            "1.83783783783784"
         ],
         "wrong_formulas": [
-            "\\frac{a}{b}",
             "a - b",
-            "String option"
+            "String option",
+            "\\frac{a}{b}"
         ]
     }
 ]
