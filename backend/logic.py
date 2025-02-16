@@ -10,7 +10,9 @@ except ModuleNotFoundError:
 
 class Logic:
     def __init__(self):
-        self.path_to_output = 'output.json'
+        self.path_to_output_json = 'output.json'
+        self.path_to_output_txt = 'output.txt'
+        self.data = None
 
     def save_to_file(self, data):
         def default_converter(obj):
@@ -20,8 +22,46 @@ class Logic:
                 return f"{obj.p}/{obj.q}"
             return str(obj)
 
-        with open(self.path_to_output, 'w') as f:
+        with open(self.path_to_output_json, 'w') as f:
             json.dump(data, f, indent=4, default=default_converter)
+
+    def save_to_txt(self, questions):
+        """
+        Converts the list of question dictionaries into a txt file.
+        For MCQs, the correct answer is prefixed with an asterisk.
+        For FIBs, the correct answer is appended in the format **answer**.
+        """
+        lines = []
+        for idx, q in enumerate(questions, start=1):
+            question_text = self.data.get("latex_question")
+            # It is not in sympy format, conver to latex
+            question_text = sp.latex(sp.sympify(question_text))
+            params = q.get("randomized_params", {})
+            # Create a string for the randomized parameters.
+            params_str = ", ".join([f"{k}={v}" for k, v in params.items()])
+
+            # Check if this is an MCQ (wrong_answers present) or a FIB (no wrong answers)
+            if q.get("wrong_answers"):
+                # MCQ format:
+                # Header with question number, text, and parameters (if any)
+                header = f"MCQ: {idx}. {question_text}"
+                lines.append(header)
+                # List the correct answer with an asterisk prefix
+                lines.append(f"*{q.get('correct_answer')}")
+                # List each wrong answer on its own line.
+                for wa in q.get("wrong_answers"):
+                    lines.append(f"{wa}")
+            else:
+                # FIB format:
+                header = f"FIB: {idx}. {question_text}"
+                # Append the correct answer enclosed in double asterisks.
+                header += f" => **{q.get('correct_answer')}**"
+                lines.append(header)
+            # Add an empty line between questions.
+            lines.append("")
+
+        with open(self.path_to_output_txt, 'w') as f:
+            f.write("\n".join(lines))
 
     def randomize_parameters(self, parameters):
         """
@@ -64,12 +104,10 @@ class Logic:
         try:
             numerical_value = float(evaluated_value)
         except (TypeError, ValueError):
-            # If conversion fails, keep the evaluated value as is (or handle accordingly).
             numerical_value = evaluated_value
 
         original_formula_latex = sp.latex(expr)
         return numerical_value, original_formula_latex
-
 
     def process_correct_answer(self, correct_answer_data, latex_question, randomized_params):
         """
@@ -83,15 +121,15 @@ class Logic:
         else:
             expr = sp.sympify(latex_question)
 
-        evaluated_latex, original_formula_latex = self.evaluate_expression(expr, randomized_params)
+        evaluated_value, original_formula_latex = self.evaluate_expression(expr, randomized_params)
 
-        # TODO: Disable logging for production
+        # TODO: Uncomment logging below for debugging.
         # util.logger.info(f"Correct expression (unsolved): {expr}")
         # util.logger.info(f"Substituted expression: {expr.subs(randomized_params)}")
-        # util.logger.info(f"Evaluated value: {evaluated_latex}")
+        # util.logger.info(f"Evaluated value: {evaluated_value}")
 
         return {
-            'correct_answer': evaluated_latex,
+            'correct_answer': evaluated_value,
             'correct_formula': original_formula_latex
         }
 
@@ -119,7 +157,6 @@ class Logic:
                     "formula": sp.latex(original_wrong_expr)
                 })
         
-        # If answer_number is None, default to using all wrong options.
         if answer_number is None:
             answer_number = len(wrong_options)
         
@@ -135,6 +172,7 @@ class Logic:
         Determines whether the question is FIB (no wrong answers) or MCQ (with wrong answers)
         based on whether 'wrong_answers' is None.
         """
+        self.data = data
         latex_question = data.get("latex_question")
         parameters = data.get("parameters")
         correct_answer_data = data.get("correct_answer")
@@ -147,25 +185,26 @@ class Logic:
             randomized_params = self.randomize_parameters(parameters)
             correct_data = self.process_correct_answer(correct_answer_data, latex_question, randomized_params)
 
+            # Include the original question text for the txt file.
             question_dict = {
+                'question_text': latex_question,
                 'randomized_params': randomized_params,
                 'correct_answer': correct_data['correct_answer'],
                 'correct_formula': correct_data['correct_formula']
             }
 
-            # Determine if this is an MCQ or FIB question.
             if wrong_answers is not None:
                 wrong_vals, wrong_formulas = self.process_wrong_answers(wrong_answers, randomized_params, answer_number)
                 question_dict['wrong_answers'] = wrong_vals
                 question_dict['wrong_formulas'] = wrong_formulas
             else:
-                # For FIB, there are no wrong answers.
                 question_dict['wrong_answers'] = []
                 question_dict['wrong_formulas'] = []
 
             random_questions.append(question_dict)
 
         self.save_to_file(random_questions)
+        self.save_to_txt(random_questions)
         return random_questions
 
 
@@ -208,7 +247,7 @@ if __name__ == "__main__":
 
     # Example shared_data for FIB-type (without wrong answers)
     data_fib = {
-        "latex_question": "a*x = b",
+        "latex_question": "Eq(a*x, b)",
         "parameters": [
             {
                 "name": "a",
@@ -237,6 +276,7 @@ if __name__ == "__main__":
     }
 
     # Run the logic to generate questions.
-    # Test either MCQ or FIB by providing the corresponding data.
-    questions = logic.perform_logic(data_mcq)
-    # questions = logic.perform_logic(data_fib)
+    # Uncomment one of the following lines to test MCQ or FIB.
+
+    # questions = logic.perform_logic(data_mcq)
+    questions = logic.perform_logic(data_fib)
