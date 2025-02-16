@@ -84,8 +84,6 @@ class Logic:
             })
 
         # Should output the random questions to a specified file
-        # with open(self.path_to_output, 'w') as f:
-        #     json.dump(random_questions, f, indent=4)
         self.save_to_file(random_questions)
         return random_questions
     
