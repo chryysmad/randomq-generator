@@ -163,13 +163,8 @@ class WrongsPage(tk.Frame):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
     def add_entry_field(self, index):
-        """
-        Creates one "row" containing:
-          - A label "Option {index}:"
-          - An Entry
-          - A trash-bin button if index > 1
-        All inside row_frame, placed at (row=index) in inner_frame.
-        """
+        grid_row = len(self.entries) + 1
+
         row_frame = tk.Frame(self.inner_frame, bg="#F5F5F5")
         row_frame.grid(row=index, column=0, sticky="w", pady=2)
 
