@@ -110,7 +110,7 @@ class WrongsPage(tk.Frame):
         )
         number_label.pack(side="left", padx=(10, 0))
 
-        # create spinbox with a default value of 1
+        self.answer_number_var = tk.StringVar(value="1")
         self.answer_number_spinbox = tk.Spinbox(
             self.bottom_frame,
             from_=1,
@@ -120,12 +120,9 @@ class WrongsPage(tk.Frame):
             bg="#FFFFFF",
             fg="#000716",
             font=("Inter", 16 * -1),
-            validate="focusout",
-            validatecommand=self.validate_spinbox
+            textvariable=self.answer_number_var,
+            state="readonly"
         )
-
-        self.answer_number_spinbox.delete(0, tk.END)
-        self.answer_number_spinbox.insert(0, "1")
         self.answer_number_spinbox.pack(side="left", padx=(10, 0), pady=10)
 
         button_2_img = PhotoImage(file=self.relative_to_assets("button_2.png"))
@@ -147,31 +144,22 @@ class WrongsPage(tk.Frame):
         if hasattr(self, 'answer_number_spinbox'):
             new_max = len(self.entries) if len(self.entries) > 0 else 1
             self.answer_number_spinbox.config(to=new_max)
-           
             try:
                 current_val = int(self.answer_number_spinbox.get())
             except ValueError:
                 current_val = 1
             if current_val > new_max:
+                self.answer_number_spinbox.config(state="normal")
                 self.answer_number_spinbox.delete(0, tk.END)
                 self.answer_number_spinbox.insert(0, str(new_max))
-
-    def validate_spinbox(self):
-        try:
-            value = int(self.answer_number_spinbox.get())
-        except ValueError:
-            value = 1
-        max_val = len(self.entries) if len(self.entries) > 0 else 1
-        if value > max_val:
-            self.answer_number_spinbox.delete(0, tk.END)
-            self.answer_number_spinbox.insert(0, str(max_val))
-        return True
+                self.answer_number_spinbox.config(state="readonly")
 
     def add_entry_field(self):
         grid_row = len(self.entries) + 1
         row_frame = tk.Frame(self.inner_frame, bg="#F5F5F5")
         row_frame.grid(row=grid_row, column=0, sticky="w", pady=2)
 
+        # unique label number for this row
         label_num = self.option_counter
         self.option_counter += 1
 
@@ -192,7 +180,6 @@ class WrongsPage(tk.Frame):
             highlightthickness=0
         )
         entry.grid(row=0, column=1, padx=5)
-
 
         new_placeholders = {entry: "Enter the string or function here..."}
         def on_focus_in(event):
@@ -257,7 +244,6 @@ class WrongsPage(tk.Frame):
 
     def process_entries_and_continue(self):
         self.wrong_answers.clear()
-
         for option_frame in self.entries:
             text = option_frame['entry'].get().strip()
             if text.startswith("t:"):
@@ -272,7 +258,6 @@ class WrongsPage(tk.Frame):
                     self.wrong_answers.append(None)
             else:
                 self.wrong_answers.append(text)
-
         self.collect_wrong_answers()
         self.controller.show_frame("RandomizerPage")
 
@@ -280,11 +265,8 @@ class WrongsPage(tk.Frame):
         row_frame = option_frame.get('row_frame')
         if row_frame:
             row_frame.destroy()
-
         if option_frame in self.entries:
             self.entries.remove(option_frame)
-
         for new_index, frame_dict in enumerate(self.entries, start=1):
             frame_dict['row_frame'].grid_configure(row=new_index)
-
         self.update_scroll_region()
