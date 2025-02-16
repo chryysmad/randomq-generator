@@ -2,77 +2,45 @@
     {
         "question_text": "Eq(a*x, b)",
         "randomized_params": {
-            "a": 52,
-            "b": 8
+            "a": 8,
+            "b": 16
         },
-        "correct_answer": 0.15384615384615385,
+        "correct_answer": 2.0,
         "correct_formula": "\\frac{b}{a}",
-        "wrong_answers": [
-            "String option",
-            "6.5",
-            "44.0"
-        ],
-        "wrong_formulas": [
-            "String option",
-            "\\frac{a}{b}",
-            "a - b"
-        ]
+        "wrong_answers": [],
+        "wrong_formulas": []
     },
     {
         "question_text": "Eq(a*x, b)",
         "randomized_params": {
-            "a": 100,
-            "b": 45
+            "a": 6,
+            "b": 49
         },
-        "correct_answer": 0.45,
+        "correct_answer": 8.166666666666666,
         "correct_formula": "\\frac{b}{a}",
-        "wrong_answers": [
-            "String option",
-            "2.22222222222222",
-            "55.0"
-        ],
-        "wrong_formulas": [
-            "String option",
-            "\\frac{a}{b}",
-            "a - b"
-        ]
+        "wrong_answers": [],
+        "wrong_formulas": []
     },
     {
         "question_text": "Eq(a*x, b)",
         "randomized_params": {
-            "a": 92,
-            "b": 19
+            "a": 42,
+            "b": 5
         },
-        "correct_answer": 0.20652173913043478,
+        "correct_answer": 0.11904761904761904,
         "correct_formula": "\\frac{b}{a}",
-        "wrong_answers": [
-            "4.84210526315789",
-            "73.0",
-            "String option"
-        ],
-        "wrong_formulas": [
-            "\\frac{a}{b}",
-            "a - b",
-            "String option"
-        ]
+        "wrong_answers": [],
+        "wrong_formulas": []
     },
     {
         "question_text": "Eq(a*x, b)",
         "randomized_params": {
-            "a": 92,
-            "b": 35
+            "a": 34,
+            "b": 43
         },
-        "correct_answer": 0.3804347826086957,
+        "correct_answer": 1.2647058823529411,
         "correct_formula": "\\frac{b}{a}",
-        "wrong_answers": [
-            "57.0",
-            "String option",
-            "2.62857142857143"
-        ],
-        "wrong_formulas": [
-            "a - b",
-            "String option",
-            "\\frac{a}{b}"
-        ]
+        "wrong_answers": [],
+        "wrong_formulas": []
     }
 ]

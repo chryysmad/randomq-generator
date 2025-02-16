@@ -54,8 +54,6 @@ class Logic:
             else:
                 # FIB format:
                 header = f"FIB: {idx}. {question_text}"
-                if params_str:
-                    header += f" (Parameters: {params_str})"
                 # Append the correct answer enclosed in double asterisks.
                 header += f" => **{q.get('correct_answer')}**"
                 lines.append(header)
@@ -249,7 +247,7 @@ if __name__ == "__main__":
 
     # Example shared_data for FIB-type (without wrong answers)
     data_fib = {
-        "latex_question": "a*x = b",
+        "latex_question": "Eq(a*x, b)",
         "parameters": [
             {
                 "name": "a",
@@ -280,5 +278,5 @@ if __name__ == "__main__":
     # Run the logic to generate questions.
     # Uncomment one of the following lines to test MCQ or FIB.
 
-    questions = logic.perform_logic(data_mcq)
-    # questions = logic.perform_logic(data_fib)
+    # questions = logic.perform_logic(data_mcq)
+    questions = logic.perform_logic(data_fib)
