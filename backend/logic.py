@@ -66,9 +66,10 @@ class Logic:
 
         evaluated_latex, original_formula_latex = self.evaluate_expression(expr, randomized_params)
 
-        util.logger.info(f"Correct expression (unsolved): {expr}")
-        util.logger.info(f"Substituted expression: {expr.subs(randomized_params)}")
-        util.logger.info(f"Evaluated value: {evaluated_latex}")
+        # TODO: Disable logging for production
+        # util.logger.info(f"Correct expression (unsolved): {expr}")
+        # util.logger.info(f"Substituted expression: {expr.subs(randomized_params)}")
+        # util.logger.info(f"Evaluated value: {evaluated_latex}")
 
         return {
             'correct_answer': evaluated_latex,
