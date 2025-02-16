@@ -43,14 +43,33 @@ class Logic:
 
     def evaluate_expression(self, expr, randomized_params):
         """
-        Substitutes randomized parameters in the expression, evaluates it, 
-        and returns a tuple with the evaluated result (LaTeX) and the original formula (LaTeX).
+        Substitutes randomized parameters in the expression, evaluates it,
+        and returns a tuple with the numerical evaluated result and the original formula (LaTeX).
+        If the expression is an equation (sp.Equality), it solves for x.
         """
         substituted_expr = expr.subs(randomized_params)
-        evaluated_value = substituted_expr.evalf()
-        evaluated_latex = sp.latex(evaluated_value)
+
+        # Check if the substituted expression is an equation.
+        if isinstance(substituted_expr, sp.Equality):
+            # Solve the equation for x (assuming x is the unknown variable).
+            solution = sp.solve(substituted_expr, sp.symbols('x'))
+            if not solution:
+                raise ValueError("No solution found for the equation.")
+            # For simplicity, use the first solution.
+            evaluated_value = sp.N(solution[0])
+        else:
+            evaluated_value = substituted_expr.evalf()
+
+        # Convert the evaluated value to a float if possible.
+        try:
+            numerical_value = float(evaluated_value)
+        except (TypeError, ValueError):
+            # If conversion fails, keep the evaluated value as is (or handle accordingly).
+            numerical_value = evaluated_value
+
         original_formula_latex = sp.latex(expr)
-        return evaluated_latex, original_formula_latex
+        return numerical_value, original_formula_latex
+
 
     def process_correct_answer(self, correct_answer_data, latex_question, randomized_params):
         """
@@ -189,7 +208,7 @@ if __name__ == "__main__":
 
     # Example shared_data for FIB-type (without wrong answers)
     data_fib = {
-        "latex_question": "Eq(a*x, b)",
+        "latex_question": "a*x = b",
         "parameters": [
             {
                 "name": "a",

@@ -1,78 +1,82 @@
 [
     {
-        "question_text": "Eq(a*x, b)",
         "randomized_params": {
-            "a": 18,
-            "b": 48
+            "a": 2,
+            "b": 7
         },
-        "correct_answer": "2.66666666666667",
-        "correct_formula": "\\frac{b}{a}",
+        "correct_answer": 3.5,
+        "correct_formula": "a x = b",
         "wrong_answers": [
-            "-30.0",
-            "0.375",
-            "String option"
+            "bleh",
+            "-5.0"
         ],
         "wrong_formulas": [
-            "a - b",
-            "\\frac{a}{b}",
-            "String option"
+            "bleh",
+            "a - b"
         ]
     },
     {
-        "question_text": "Eq(a*x, b)",
         "randomized_params": {
-            "a": 54,
-            "b": 20
+            "a": 5,
+            "b": 9
         },
-        "correct_answer": "0.37037037037037",
-        "correct_formula": "\\frac{b}{a}",
+        "correct_answer": 1.8,
+        "correct_formula": "a x = b",
         "wrong_answers": [
-            "String option",
-            "34.0",
-            "2.7"
+            "bloo",
+            "-4.0"
         ],
         "wrong_formulas": [
-            "String option",
-            "a - b",
-            "\\frac{a}{b}"
+            "bloo",
+            "a - b"
         ]
     },
     {
-        "question_text": "Eq(a*x, b)",
         "randomized_params": {
-            "a": 6,
-            "b": 8
+            "a": 3,
+            "b": 4
         },
-        "correct_answer": "1.33333333333333",
-        "correct_formula": "\\frac{b}{a}",
+        "correct_answer": 1.3333333333333333,
+        "correct_formula": "a x = b",
         "wrong_answers": [
-            "String option",
-            "-2.0",
-            "0.75"
+            "bloo",
+            "-1.0"
         ],
         "wrong_formulas": [
-            "String option",
-            "a - b",
-            "\\frac{a}{b}"
+            "bloo",
+            "a - b"
         ]
     },
     {
-        "question_text": "Eq(a*x, b)",
         "randomized_params": {
-            "a": 68,
-            "b": 37
+            "a": 8,
+            "b": 4
         },
-        "correct_answer": "0.544117647058823",
-        "correct_formula": "\\frac{b}{a}",
+        "correct_answer": 0.5,
+        "correct_formula": "a x = b",
         "wrong_answers": [
-            "31.0",
-            "String option",
-            "1.83783783783784"
+            "bloo",
+            "4.0"
         ],
         "wrong_formulas": [
-            "a - b",
-            "String option",
-            "\\frac{a}{b}"
+            "bloo",
+            "a - b"
+        ]
+    },
+    {
+        "randomized_params": {
+            "a": 2,
+            "b": 2
+        },
+        "correct_answer": 1.0,
+        "correct_formula": "a x = b",
+        "wrong_answers": [
+            "bleh",
+            "0"
+        ],
+        "wrong_formulas": [
+            "bleh",
+            "a - b"
         ]
     }
 ]
