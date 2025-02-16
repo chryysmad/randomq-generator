@@ -2,7 +2,7 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import PhotoImage
 from sympy.parsing.latex import parse_latex 
-
+import backend.util as util
 class WrongsPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
@@ -177,7 +177,7 @@ class WrongsPage(tk.Frame):
                     sympy_expr = parse_latex(latex_str)
                     self.wrong_answers.append(sympy_expr)
                 except Exception as e:
-                    print(f"Error parsing LaTeX: {e}")
+                    util.logger.error(f"Error parsing LaTeX: {e}")
                     self.wrong_answers.append(None)
 
         try:

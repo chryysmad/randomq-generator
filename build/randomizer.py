@@ -10,7 +10,7 @@ class RandomizerPage(tk.Frame):
         self.controller = controller
         self.configure(bg="#F5F5F5")
 
-        self.logic = Logic(self.controller)
+        self.logic = Logic()
 
         self.randomization_count = 0 
 
@@ -106,5 +106,5 @@ class RandomizerPage(tk.Frame):
 
         self.save_randomization_count()
 
-        self.logic.perform_logic()
+        self.logic.perform_logic(self.controller.shared_data)
         self.controller.show_frame("IntroPage") 
