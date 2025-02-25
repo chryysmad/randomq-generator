@@ -165,7 +165,7 @@ class Logic:
         """
         Generate H5P content from the output.txt file.
         """
-        h5p_parser.generate_h5p("./backend/txt2h5p/control.txt", self.path_to_output_txt)
+        h5p_parser.generate("./backend/txt2h5p/control.txt", self.path_to_output_txt)
 
     def perform_logic(self, data):
         """
@@ -249,7 +249,7 @@ if __name__ == "__main__":
         "wrong_answers": [
             sp.sympify("a/b"),
             sp.sympify("a - b"),
-            "String option"
+            "String option",
             sp.sympify("a/b"),
             sp.sympify("a - b"),
             "String option"
