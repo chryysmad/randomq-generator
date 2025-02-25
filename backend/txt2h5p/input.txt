@@ -1,0 +1,13 @@
+MCQ: 1. Who of the following is a director? 
+Rafael Nadal TIP: Grand Slam. YSEL: Rafael Nadal is a famous tennis player. NSEL: Rafael Nadal is indeed not a director.
+Cristiano Ronaldo TIP: UEFA Champions League. YSEL: Cristiano Ronaldo is a famous soccer player. NSEL: Cristiano Ronaldo is indeed not a director.
+William Shakespeare TIP: Hamlet, Romeo and Juliet and Macbeth. YSEL: William Shakespeare was a playwright. NSEL: William Shakespeare was not a film director.
+*Quentin Tarantino TIP: Pulp Fiction and Kill Bill. YSEL: Correct! Quentin Tarantino is a famous film director. NSEL: Quentin Tarantino is a well-known director.
+
+MCQ: 2. Which of the following is a letter?
+*A
+2
+345
+21
+
+FIB: 3. *Paris* is the capital of France. 

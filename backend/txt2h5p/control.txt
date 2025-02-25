@@ -1,0 +1,10 @@
+NAME_H5P: example-file.h5p
+TITLE: "This is the Title of the Quiz!"
+AUTHOR: "chryysmad"
+LICENSE: "ODC PDDL"
+INTRODUCTION: "An H5P Question Set made with txt2h5p-generator. The Quiz contains MCQs and Fill in the Blanks Questions."
+PASS_PERCENTAGE: 50
+DISABLE_BACKWARDS_NAVIGATION: false
+RANDOM_QUESTIONS: true
+POOL_SIZE: 3
+N_QUESTIONS: 3
