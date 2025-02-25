@@ -1,6 +1,6 @@
 from pathlib import Path
 import tkinter as tk 
-from tkinter import Tk, Canvas, Entry, Button, PhotoImage
+from tkinter import Canvas, Entry, Button, PhotoImage
 from build.intro import IntroPage
 from backend.logic import Logic
 
@@ -9,8 +9,10 @@ class RandomizerPage(tk.Frame):
         super().__init__(parent)
         self.controller = controller
         self.configure(bg="#F5F5F5")
-        # Initialize Logic instance.
-        self.logic = Logic()
+        # Create and store a persistent Logic instance on the controller.
+        if not hasattr(self.controller, "logic"):
+            self.controller.logic = Logic()
+        self.logic = self.controller.logic
         self.randomization_count = 0 
         OUTPUT_PATH = Path(__file__).parent
         ASSETS_PATH = OUTPUT_PATH / Path(r"./assets/frame0")
@@ -51,9 +53,7 @@ class RandomizerPage(tk.Frame):
         )
         self.entry_1 = tk.Entry(self, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
         self.entry_1.place(x=491.0, y=237.0, width=164.0, height=35.0)
-        placeholders = {
-            self.entry_1: "Enter a value..."
-        }
+        placeholders = { self.entry_1: "Enter a value..." }
         def on_focus_in(event):
             entry = event.widget
             placeholder = placeholders.get(entry)
@@ -92,9 +92,7 @@ class RandomizerPage(tk.Frame):
         except ValueError:
             self.randomization_count = 0
         self.save_randomization_count()
-        # Call the main logic.
         self.logic.perform_logic(self.controller.shared_data)
-        # Update file_counter in shared data so that IntroPage can display final generation button.
+        # Update shared file_counter so IntroPage can display the final button.
         self.controller.shared_data["file_counter"] = self.logic.file_counter
-        # Return to the intro page.
         self.controller.show_frame("IntroPage")

@@ -57,18 +57,18 @@ class IntroPage(tk.Frame):
         )
         button_2.image = button_image_2
         button_2.place(x=516.0, y=316.0, width=192.0, height=43.0)
-        # If there have been previous generations, display the final H5P button.
-        file_counter = self.controller.shared_data.get("file_counter", 1)
-        if file_counter > 1:
-            final_button = tk.Button(
-                self,
-                text="Generate Final H5P Question Set",
-                command=self.generate_final_set,
-                bg="#4CAF50",
-                fg="white",
-                font=("Inter", 16)
-            )
-            final_button.place(x=400.0, y=380.0, width=250.0, height=40.0)
+        
+        # Create final button but do not place it yet.
+        self.final_button = tk.Button(
+            self,
+            text="Generate Final H5P Question Set",
+            command=self.generate_final_set,
+            bg="#4CAF50",
+            fg="white",
+            font=("Inter", 16)
+        )
+        # Bind an event that will update the button every time this frame is shown.
+        self.bind("<<ShowFrame>>", lambda e: self.update_final_button())
 
     def relative_to_assets(self, path: str):
         OUTPUT_PATH = Path(__file__).parent
@@ -81,7 +81,14 @@ class IntroPage(tk.Frame):
         self.controller.show_frame("ParametersPage")
 
     def generate_final_set(self):
-        # Access the logic instance from the controller.
         logic = self.controller.logic  
         logic.generate_final_h5p_set()
         util.logger.info("Final H5P Question Set generated.")
+
+    def update_final_button(self):
+        # Check shared data for file_counter value.
+        file_counter = self.controller.shared_data.get("file_counter", 1)
+        if file_counter > 1:
+            self.final_button.place(x=400.0, y=380.0, width=250.0, height=40.0)
+        else:
+            self.final_button.place_forget()

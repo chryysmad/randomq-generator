@@ -8,7 +8,7 @@ from pathlib import Path
 
 class Logic:
     def __init__(self):
-        # Start counter at 1 (or load from shared state if needed)
+        # Used for naming the output files.
         self.file_counter = 1  
         self.path_to_output_json = None
         self.path_to_output_txt = None
@@ -33,14 +33,12 @@ class Logic:
             substituted_text = q.get("correct_formula")
             
             if q.get("wrong_answers"):
-                # MCQ header.
                 header = f"MCQ: {idx}. {question_text} {substituted_text}"
                 lines.append(header)
                 lines.append(f"*{q.get('correct_answer')}")
                 for wa in q.get("wrong_answers"):
                     lines.append(f"{wa}")
             else:
-                # FIB header.
                 header = f"FIB: {idx}. {question_text} {substituted_text}"
                 lines.append(header)
                 lines.append(f"=> *{q.get('correct_answer')}*")
@@ -134,14 +132,13 @@ class Logic:
         answer_number = data.get("answer_number")
         randomization_count = data.get("randomization_count")
         
-        # Use current file counter as the identifier for this generation run.
-        file_id = self.file_counter  
+        # Build a list of questions with unique identifiers (starting at 1 for this generation run).
         random_questions = []
-        for _ in range(randomization_count):
+        for i in range(randomization_count):
             randomized_params = self.randomize_parameters(parameters)
             correct_data = self.process_correct_answer(correct_answer_data, latex_question, randomized_params)
             question_dict = {
-                'identifier': file_id,  # Embed the file identifier.
+                'identifier': i + 1,   # Each question gets its own sequential ID.
                 'question_text': question_text,
                 'randomized_params': randomized_params,
                 'correct_answer': correct_data['correct_answer'],
@@ -156,13 +153,13 @@ class Logic:
                 question_dict['wrong_formulas'] = []
             random_questions.append(question_dict)
 
-        # Set file names based on file_id.
-        self.path_to_output_json = f"output{file_id}.json"
-        self.path_to_output_txt = f"output{file_id}.txt"
+        # Name the output files using the current file_counter.
+        self.path_to_output_json = f"output{self.file_counter}.json"
+        self.path_to_output_txt = f"output{self.file_counter}.txt"
         self.save_to_file(random_questions)
         self.save_to_txt(random_questions)
         self.generate_h5p()
-        # Increment counter so next run uses a new identifier.
+        # Increment the file counter for the next generation.
         self.file_counter += 1
         return random_questions
 
@@ -172,18 +169,15 @@ class Logic:
         writes the final JSON and TXT, and then runs the H5P generator.
         """
         final_questions = []
-        # Sort files based on the numeric part of the filename.
         for filename in sorted(glob.glob("output*.json"), key=lambda x: int(''.join(filter(str.isdigit, x)))):
             with open(filename, 'r') as f:
                 questions = json.load(f)
             if questions:
                 final_questions.append(random.choice(questions))
-        # Write the final outputs.
         final_json = "finalOutput.json"
         final_txt = "finalOutput.txt"
         with open(final_json, 'w') as f:
             json.dump(final_questions, f, indent=4)
-        # Build TXT content.
         lines = []
         for idx, q in enumerate(final_questions, start=1):
             question_text = q.get("question_text")
@@ -201,6 +195,80 @@ class Logic:
             lines.append("")
         with open(final_txt, 'w') as f:
             f.write("\n".join(lines))
-        # Run the H5P generator on the final TXT.
-        self.path_to_output_txt = final_txt  # update path for H5P generator.
+        self.path_to_output_txt = final_txt
         self.generate_h5p()
+
+
+
+if __name__ == "__main__":
+    logic = Logic()
+
+    # Example shared_data for MCQ-type (with wrong answers)
+    data_mcq = {
+        "question_text": "Solve the equation to the 3rd decimal place.",
+        "latex_question": "Eq(a*x, b)",
+        "parameters": [
+            {
+                "name": "a",
+                "range_from": "0",
+                "range_to": "100",
+                "excluding": "0",
+                "step": "2"
+            },
+            {
+                "name": "b",
+                "range_from": "0",
+                "range_to": "50",
+                "excluding": "1",
+                "step": "1"
+            }
+        ],
+        "correct_answer": {
+            "answer_mode": "function",
+            "function": sp.sympify("b/a")
+        },
+        "wrong_answers": [
+            sp.sympify("a/b"),
+            sp.sympify("a - b"),
+            "String option",
+            sp.sympify("a/b"),
+            sp.sympify("a - b"),
+            "String option"
+        ],
+        "answer_number": 3,
+        "randomization_count": 4
+    }
+
+    # Example shared_data for FIB-type (without wrong answers)
+    data_fib = {
+        "question_text": "Find x given the equation.",
+        "latex_question": "Eq(a*x, b)",
+        "parameters": [
+            {
+                "name": "a",
+                "range_from": "0",
+                "range_to": "100",
+                "excluding": "0",
+                "step": "2"
+            },
+            {
+                "name": "b",
+                "range_from": "0",
+                "range_to": "50",
+                "excluding": "1",
+                "step": "1"
+            }
+        ],
+        "correct_answer": {
+            "answer_mode": "function",
+            "function": sp.sympify("b/a")
+        },
+        "wrong_answers": None,
+        "answer_number": 0,
+        "randomization_count": 4
+    }
+
+    # Uncomment one of the following lines to test MCQ or FIB.
+    
+    # questions = logic.perform_logic(data_mcq)
+    questions = logic.perform_logic(data_fib)
