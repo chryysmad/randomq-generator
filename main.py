@@ -11,6 +11,7 @@ class BaseApp(tk.Tk):
         super().__init__(*args, **kwargs)
 
         self.shared_data = {
+            "question_text": None,
             "latex_question": None,
             "parameters": [], 
             "correct_answer": None, 
@@ -49,6 +50,8 @@ class BaseApp(tk.Tk):
 
     def save_parameters(self, parameters):
         self.shared_data["parameters"] = parameters
+    def save_question_text(self, question_text):
+        self.shared_data["question_text"] = question_text
 
 if __name__ == "__main__":
     app = BaseApp()

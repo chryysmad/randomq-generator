@@ -28,40 +28,42 @@ class Logic:
     def save_to_txt(self, questions):
         """
         Converts the list of question dictionaries into a txt file.
-        For MCQs, the correct answer is prefixed with an asterisk.
-        For FIBs, the correct answer is appended in the format **answer**.
+        For MCQs, the header is formatted as:
+        "MCQ: {question number}. {question text} {question formula}"
+        and the correct answer is prefixed with an asterisk on the next line,
+        with each wrong answer on its own line.
+        For FIBs, the header is formatted similarly, with the correct answer
+        appended after an arrow.
         """
         lines = []
         for idx, q in enumerate(questions, start=1):
-            question_text = self.data.get("latex_question")
-            # It is not in sympy format, conver to latex
-            question_text = sp.latex(sp.sympify(question_text))
+            question_text = q.get("question_text")
+            # The substituted question formula (e.g., "3x+5=10") is stored as "correct_formula".
+            substituted_text = q.get("correct_formula")
             params = q.get("randomized_params", {})
-            # Create a string for the randomized parameters.
-            params_str = ", ".join([f"{k}={v}" for k, v in params.items()])
-
-            # Check if this is an MCQ (wrong_answers present) or a FIB (no wrong answers)
+            
             if q.get("wrong_answers"):
-                # MCQ format:
-                # Header with question number, text, and parameters (if any)
-                header = f"MCQ: {idx}. {question_text}"
+                # MCQ header: "MCQ: {number}. {question_text} {substituted_text}"
+                header = f"MCQ: {idx}. {question_text} {substituted_text}"
                 lines.append(header)
-                # List the correct answer with an asterisk prefix
+                # List the correct answer with an asterisk prefix.
                 lines.append(f"*{q.get('correct_answer')}")
                 # List each wrong answer on its own line.
                 for wa in q.get("wrong_answers"):
                     lines.append(f"{wa}")
             else:
-                # FIB format:
-                header = f"FIB: {idx}. {question_text}"
-                # Append the correct answer enclosed in double asterisks.
-                header += f" => **{q.get('correct_answer')}**"
+                # FIB header: "FIB: {number}. {question_text} {substituted_text}"
+                header = f"FIB: {idx}. {question_text} {substituted_text}"
                 lines.append(header)
+                # Append the correct answer enclosed in double asterisks.
+                lines.append(f"=> **{q.get('correct_answer')}**")
             # Add an empty line between questions.
             lines.append("")
 
         with open(self.path_to_output_txt, 'w') as f:
             f.write("\n".join(lines))
+
+
 
     def randomize_parameters(self, parameters):
         """
@@ -89,18 +91,14 @@ class Logic:
         """
         substituted_expr = expr.subs(randomized_params)
 
-        # Check if the substituted expression is an equation.
         if isinstance(substituted_expr, sp.Equality):
-            # Solve the equation for x (assuming x is the unknown variable).
             solution = sp.solve(substituted_expr, sp.symbols('x'))
             if not solution:
                 raise ValueError("No solution found for the equation.")
-            # For simplicity, use the first solution.
             evaluated_value = sp.N(solution[0])
         else:
             evaluated_value = substituted_expr.evalf()
 
-        # Convert the evaluated value to a float if possible.
         try:
             numerical_value = float(evaluated_value)
         except (TypeError, ValueError):
@@ -114,23 +112,22 @@ class Logic:
         Process the correct answer.
         If answer_mode is 'function', use the provided function expression,
         otherwise convert the LaTeX question to a sympy expression.
-        Returns a dictionary with evaluated answer and original formula.
+        Returns a dictionary with evaluated answer and the substituted formula.
         """
         if correct_answer_data['answer_mode'] == 'function':
             expr = correct_answer_data['function']
         else:
             expr = sp.sympify(latex_question)
 
-        evaluated_value, original_formula_latex = self.evaluate_expression(expr, randomized_params)
+        evaluated_value, _ = self.evaluate_expression(expr, randomized_params)
+        evaluated_value = round(evaluated_value, 3)
 
-        # TODO: Uncomment logging below for debugging.
-        # util.logger.info(f"Correct expression (unsolved): {expr}")
-        # util.logger.info(f"Substituted expression: {expr.subs(randomized_params)}")
-        # util.logger.info(f"Evaluated value: {evaluated_value}")
+        # Substitute the randomized parameters into the expression and convert to LaTeX.
+        substituted_formula = sp.latex(expr.subs(randomized_params))
 
         return {
             'correct_answer': evaluated_value,
-            'correct_formula': original_formula_latex
+            'correct_formula': substituted_formula
         }
 
     def process_wrong_answers(self, wrong_answers, randomized_params, answer_number):
@@ -152,6 +149,7 @@ class Logic:
                 original_wrong_expr = wrong_item
                 substituted_wrong_expr = original_wrong_expr.subs(randomized_params)
                 evaluated_wrong_value = substituted_wrong_expr.evalf()
+                evaluated_wrong_value = round(evaluated_wrong_value, 3)
                 wrong_options.append({
                     "value": sp.latex(evaluated_wrong_value),
                     "formula": sp.latex(original_wrong_expr)
@@ -174,6 +172,8 @@ class Logic:
         """
         self.data = data
         latex_question = data.get("latex_question")
+        question_text = data.get("question_text", latex_question)
+
         parameters = data.get("parameters")
         correct_answer_data = data.get("correct_answer")
         wrong_answers = data.get("wrong_answers")
@@ -185,9 +185,8 @@ class Logic:
             randomized_params = self.randomize_parameters(parameters)
             correct_data = self.process_correct_answer(correct_answer_data, latex_question, randomized_params)
 
-            # Include the original question text for the txt file.
             question_dict = {
-                'question_text': latex_question,
+                'question_text': question_text,
                 'randomized_params': randomized_params,
                 'correct_answer': correct_data['correct_answer'],
                 'correct_formula': correct_data['correct_formula']
@@ -213,6 +212,7 @@ if __name__ == "__main__":
 
     # Example shared_data for MCQ-type (with wrong answers)
     data_mcq = {
+        "question_text": "Solve the equation to the 3rd decimal place.",
         "latex_question": "Eq(a*x, b)",
         "parameters": [
             {
@@ -230,16 +230,14 @@ if __name__ == "__main__":
                 "step": "1"
             }
         ],
-        # The correct answer is x = b/a (as a sympy expression)
         "correct_answer": {
             "answer_mode": "function",
             "function": sp.sympify("b/a")
         },
-        # Provide three wrong answer options (mix of sympy expressions and strings)
         "wrong_answers": [
-            sp.sympify("a/b"),    # Wrong: reciprocal of b/a
-            sp.sympify("a - b"),   # Wrong: difference between a and b
-            "String option"        # A string option
+            sp.sympify("a/b"),
+            sp.sympify("a - b"),
+            "String option"
         ],
         "answer_number": 3,
         "randomization_count": 4
@@ -247,6 +245,7 @@ if __name__ == "__main__":
 
     # Example shared_data for FIB-type (without wrong answers)
     data_fib = {
+        "question_text": "Find x given the equation.",
         "latex_question": "Eq(a*x, b)",
         "parameters": [
             {
@@ -264,12 +263,10 @@ if __name__ == "__main__":
                 "step": "1"
             }
         ],
-        # The correct answer is x = b/a (as a sympy expression)
         "correct_answer": {
             "answer_mode": "function",
             "function": sp.sympify("b/a")
         },
-        # FIB-type: No wrong answers provided.
         "wrong_answers": None,
         "answer_number": 0,
         "randomization_count": 4
@@ -277,6 +274,6 @@ if __name__ == "__main__":
 
     # Run the logic to generate questions.
     # Uncomment one of the following lines to test MCQ or FIB.
-
+    
     # questions = logic.perform_logic(data_mcq)
     questions = logic.perform_logic(data_fib)
