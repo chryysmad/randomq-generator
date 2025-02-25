@@ -57,7 +57,7 @@ class Logic:
                 header = f"FIB: {idx}. {question_text} {substituted_text}"
                 lines.append(header)
                 # Append the correct answer enclosed in double asterisks.
-                lines.append(f"=> **{q.get('correct_answer')}**")
+                lines.append(f"=> *{q.get('correct_answer')}*")
             # Add an empty line between questions.
             lines.append("")
 
@@ -160,6 +160,12 @@ class Logic:
         final_wrong_formulas = [opt["formula"] for opt in final_wrong_options]
 
         return final_wrong_values, final_wrong_formulas
+
+    def generate_h5p(self):
+        """
+        Generate H5P content from the output.txt file.
+        """
+        h5p_parser.generate_h5p("./backend/txt2h5p/control.txt", self.path_to_output_txt)
 
     def perform_logic(self, data):
         """
