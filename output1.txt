@@ -1,0 +1,11 @@
+MCQ: 1. Solve this pls 2 x + 29 = 1
+*-14.0
+this is a test
+31.0
+hello
+
+MCQ: 2. Solve this pls 7 x + 21 = 1
+*-2.86
+28.0
+hello
+this is a test
