@@ -1,6 +1,7 @@
 import random
 import sympy as sp
-import json
+import json  
+import backend.txt2h5p.parser as h5p_parser
 
 try:
     import backend.util as util
@@ -49,7 +50,6 @@ class Logic:
                 lines.append(header)
                 # List the correct answer with an asterisk prefix.
                 lines.append(f"*{q.get('correct_answer')}")
-                # List each wrong answer on its own line.
                 for wa in q.get("wrong_answers"):
                     lines.append(f"{wa}")
             else:
@@ -88,7 +88,6 @@ class Logic:
         """
         Substitutes randomized parameters in the expression, evaluates it,
         and returns a tuple with the numerical evaluated result and the original formula (LaTeX).
-        If the expression is an equation (sp.Equality), it solves for x.
         """
         substituted_expr = expr.subs(randomized_params)
 
@@ -134,9 +133,6 @@ class Logic:
     def process_wrong_answers(self, wrong_answers, randomized_params, answer_number):
         """
         Process the wrong answers if provided.
-        For each wrong answer that is a sympy expression, store its evaluated result and original formula.
-        If a wrong answer is a string, just pass it through.
-        Randomly selects the desired number of wrong answers.
         Returns a tuple (list of evaluated answers, list of original formulas).
         """
         wrong_options = []
@@ -168,8 +164,7 @@ class Logic:
     def perform_logic(self, data):
         """
         Main logic to generate questions.
-        Determines whether the question is FIB (no wrong answers) or MCQ (with wrong answers)
-        based on whether 'wrong_answers' is None.
+        Determines whether the question is FIB (no wrong answers) or MCQ (with wrong answers).
         """
         self.data = data
         latex_question = data.get("latex_question")
@@ -211,6 +206,10 @@ class Logic:
 
         self.save_to_file(random_questions)
         self.save_to_txt(random_questions)
+        
+        # Call the H5P generator after generating the txt file.
+        self.generate_h5p()
+        
         return random_questions
 
 
@@ -242,6 +241,9 @@ if __name__ == "__main__":
             "function": sp.sympify("b/a")
         },
         "wrong_answers": [
+            sp.sympify("a/b"),
+            sp.sympify("a - b"),
+            "String option"
             sp.sympify("a/b"),
             sp.sympify("a - b"),
             "String option"
@@ -279,7 +281,6 @@ if __name__ == "__main__":
         "randomization_count": 4
     }
 
-    # Run the logic to generate questions.
     # Uncomment one of the following lines to test MCQ or FIB.
     
     # questions = logic.perform_logic(data_mcq)
