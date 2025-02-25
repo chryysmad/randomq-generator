@@ -55,7 +55,7 @@ class Logic:
                 # FIB format:
                 header = f"FIB: {idx}. {question_text}"
                 # Append the correct answer enclosed in double asterisks.
-                header += f" => **{q.get('correct_answer')}**"
+                header += f" => *{q.get('correct_answer')}*"
                 lines.append(header)
             # Add an empty line between questions.
             lines.append("")
