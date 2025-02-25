@@ -13,6 +13,7 @@ class Logic:
         self.path_to_output_json = 'output.json'
         self.path_to_output_txt = 'output.txt'
         self.data = None
+        self.precision = 3
 
     def save_to_file(self, data):
         def default_converter(obj):
@@ -120,7 +121,7 @@ class Logic:
             expr = sp.sympify(latex_question)
 
         evaluated_value, _ = self.evaluate_expression(expr, randomized_params)
-        evaluated_value = round(evaluated_value, 3)
+        evaluated_value = round(evaluated_value, self.precision)
 
         # Substitute the randomized parameters into the expression and convert to LaTeX.
         substituted_formula = sp.latex(expr.subs(randomized_params))
@@ -149,7 +150,7 @@ class Logic:
                 original_wrong_expr = wrong_item
                 substituted_wrong_expr = original_wrong_expr.subs(randomized_params)
                 evaluated_wrong_value = substituted_wrong_expr.evalf()
-                evaluated_wrong_value = round(evaluated_wrong_value, 3)
+                evaluated_wrong_value = round(evaluated_wrong_value, self.precision)
                 wrong_options.append({
                     "value": sp.latex(evaluated_wrong_value),
                     "formula": sp.latex(original_wrong_expr)
@@ -173,6 +174,12 @@ class Logic:
         self.data = data
         latex_question = data.get("latex_question")
         question_text = data.get("question_text", latex_question)
+        try:
+            precision = int(data.get("precision"))
+            if precision > 0:
+                self.precision = precision
+        except (TypeError, ValueError):
+            util.logger.error(f"Invalid precision value: {data.get('precision')}")
 
         parameters = data.get("parameters")
         correct_answer_data = data.get("correct_answer")

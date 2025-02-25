@@ -35,7 +35,7 @@ class ParametersPage(tk.Frame):
             bg="#F5F5F5",
             bd=0,
             highlightthickness=0,
-            height=300  # increased height to accommodate extra textbox
+            height=350  # increased height to accommodate extra textbox
         )
         self.top_canvas.pack(fill="both", expand=True)
         self.create_top_section()
@@ -158,7 +158,36 @@ class ParametersPage(tk.Frame):
         self.entry_1.bind("<FocusOut>", on_focus_out)
         self.entry_1.insert("1.0", self.placeholders[self.entry_1])
         self.entry_1.config(fg="#C0C0C0")
-
+        
+        # --- New Input Box for Precision ---
+        # Define a validation function to allow only digits.
+        def validate_digit(P):
+            return P.isdigit() or P == ""
+        
+        vcmd = self.register(validate_digit)
+        # Leave some vertical space
+        self.top_canvas.create_line(0, 295, 1000, 295, fill="#F5F5F5")
+        # Create a label for the precision input
+        self.top_canvas.create_text(
+            32.0,
+            295.0,
+            anchor="nw",
+            text="Precision:",
+            fill="#1E1E1E",
+            font=("Inter", 16 * -1)
+        )
+        # Create the precision entry box, placed to the right of the label.
+        self.precision_entry = tk.Entry(
+            self.top_frame,
+            bd=0,
+            bg="#FFFFFF",
+            fg="#000716",
+            highlightthickness=0,
+            validate="key",
+            validatecommand=(vcmd, '%P')
+        )
+        self.precision_entry.place(x=150.0, y=290.0, width=100.0, height=30)
+        self.precision_entry.insert(0, "0")  # Default value
 
     def create_bottom_section(self):
         self.button_image_1 = PhotoImage(file=self.relative_to_assets("button_1.png"))
@@ -316,6 +345,7 @@ class ParametersPage(tk.Frame):
         self.controller.save_parameters(self.parameters_data)
         self.controller.show_frame("CorrectPage")
         self.controller.save_question_text(self.entry_problem.get("1.0", "end-1c"))
+        self.controller.save_precision(self.precision_entry.get())
 
     def delete_parameter(self, param_frame):
         if self.entries and self.entries[0] == param_frame:
