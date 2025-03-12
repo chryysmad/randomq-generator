@@ -79,7 +79,8 @@ class ParametersPage(tk.Frame):
         latex_input = self.entry_1.get("1.0", "end-1c")
         self.controller.save_has_visited_parameters(True)
         try:
-            self.latex_question = sp.sympify(parse_latex(latex_input))
+            self.latex_question = parse_latex(latex_input)
+            util.logger.info(f"Parsed expression: {self.latex_question}")
         except Exception as e:
             util.logger.error(f"Error parsing LaTeX: {e}")
 
