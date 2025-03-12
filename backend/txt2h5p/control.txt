@@ -1,8 +1,8 @@
-NAME_H5P: lumi-output.h5p
-TITLE: "Linear Equations"
-AUTHOR: "chrysanthi"
+NAME_H5P: output-test.h5p
+TITLE: "This is the quiz number 2!"
+AUTHOR: "chryyyyyys"
 LICENSE: "ODC PDDL"
-INTRODUCTION: "This is the description of the H5P quiz that was generated."
+INTRODUCTION: "This is an example description."
 PASS_PERCENTAGE: 55
 DISABLE_BACKWARDS_NAVIGATION: false
 RANDOM_QUESTIONS: true

@@ -253,7 +253,7 @@ class Logic:
         lines = []
         for idx, q in enumerate(final_questions, start=1):
             question_text = q.get("question_text")
-            substituted_text = q.get("correct_formula")
+            substituted_text = q.get("original_formula")
             if q.get("wrong_answers"):
                 header = f"MCQ: {idx}. {question_text} {substituted_text}"
                 lines.append(header)
