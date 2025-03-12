@@ -1,82 +1,50 @@
 [
     {
+        "question_text": "Compute the definite integral from 0 to a:",
         "randomized_params": {
-            "a": 2,
-            "b": 7
+            "a": 2
         },
-        "correct_answer": 3.5,
-        "correct_formula": "a x = b",
+        "correct_answer": 2.667,
+        "correct_formula": "\\frac{8}{3}",
         "wrong_answers": [
-            "bleh",
-            "-5.0"
+            "No integral done",
+            "8.0"
         ],
         "wrong_formulas": [
-            "bleh",
-            "a - b"
+            "No integral done",
+            "2 a^{2}"
         ]
     },
     {
+        "question_text": "Compute the definite integral from 0 to a:",
         "randomized_params": {
-            "a": 5,
-            "b": 9
+            "a": 5
         },
-        "correct_answer": 1.8,
-        "correct_formula": "a x = b",
+        "correct_answer": 41.667,
+        "correct_formula": "\\frac{125}{3}",
         "wrong_answers": [
-            "bloo",
-            "-4.0"
+            "50.0",
+            "12.5"
         ],
         "wrong_formulas": [
-            "bloo",
-            "a - b"
+            "2 a^{2}",
+            "\\frac{a^{2}}{2}"
         ]
     },
     {
+        "question_text": "Compute the definite integral from 0 to a:",
         "randomized_params": {
-            "a": 3,
-            "b": 4
+            "a": 6
         },
-        "correct_answer": 1.3333333333333333,
-        "correct_formula": "a x = b",
+        "correct_answer": 72.0,
+        "correct_formula": "72",
         "wrong_answers": [
-            "bloo",
-            "-1.0"
+            "72.0",
+            "18.0"
         ],
         "wrong_formulas": [
-            "bloo",
-            "a - b"
-        ]
-    },
-    {
-        "randomized_params": {
-            "a": 8,
-            "b": 4
-        },
-        "correct_answer": 0.5,
-        "correct_formula": "a x = b",
-        "wrong_answers": [
-            "bloo",
-            "4.0"
-        ],
-        "wrong_formulas": [
-            "bloo",
-            "a - b"
-        ]
-    },
-    {
-        "randomized_params": {
-            "a": 2,
-            "b": 2
-        },
-        "correct_answer": 1.0,
-        "correct_formula": "a x = b",
-        "wrong_answers": [
-            "bleh",
-            "0"
-        ],
-        "wrong_formulas": [
-            "bleh",
-            "a - b"
+            "2 a^{2}",
+            "\\frac{a^{2}}{2}"
         ]
     }
 ]
