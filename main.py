@@ -5,6 +5,9 @@ from build.intro import IntroPage
 from build.correct import CorrectPage
 from build.wrongs import WrongsPage
 from build.randomizer import RandomizerPage
+import argparse
+import backend.logic as logic
+import json
 
 class BaseApp(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -51,12 +54,30 @@ class BaseApp(tk.Tk):
 
     def save_parameters(self, parameters):
         self.shared_data["parameters"] = parameters
+
     def save_question_text(self, question_text):
         self.shared_data["question_text"] = question_text
+
     def save_precision(self, precision):
         self.shared_data["precision"] = precision
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Random Question Generator")
+    parser.add_argument("--json-path", type=str, help="Path to the JSON file containing the question data.")
+    args = parser.parse_args()
+    if args.json_path:
+        json_path = Path(args.json_path)
+        print("Multi-input mode enabled.")
+        with open(json_path, "r") as f:
+            data_list = json.load(f)
+        if not isinstance(data_list, list):
+            print("The JSON file is not a list.")
+            exit(1)
+        # Create a Logic instance and process all questions in the JSON list.
+        logic_instance = logic.Logic()
+        all_questions = logic_instance.perform_logic_all(data_list)
+        print(all_questions)
+        exit(0)
     app = BaseApp()
     app.resizable(False, False)
     app.mainloop()
