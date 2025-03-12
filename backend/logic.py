@@ -158,7 +158,8 @@ class Logic:
         self.path_to_output_txt = f"output{self.file_counter}.txt"
         self.save_to_file(random_questions)
         self.save_to_txt(random_questions)
-        self.generate_h5p()
+        # Removed redundant H5P generation here.
+        # self.generate_h5p()
         # Increment the file counter for the next generation.
         self.file_counter += 1
         return random_questions
@@ -197,7 +198,6 @@ class Logic:
             f.write("\n".join(lines))
         self.path_to_output_txt = final_txt
         self.generate_h5p()
-
 
 
 if __name__ == "__main__":
@@ -269,6 +269,5 @@ if __name__ == "__main__":
     }
 
     # Uncomment one of the following lines to test MCQ or FIB.
-    
     # questions = logic.perform_logic(data_mcq)
     questions = logic.perform_logic(data_fib)
