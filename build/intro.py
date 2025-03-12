@@ -105,7 +105,8 @@ class IntroPage(tk.Frame):
     def set_option(self, option):
         self.selected_option = option
         util.logger.info(f"Selected option: {option}")
-        self.controller.show_frame("ParametersPage")
+        self.controller.show_frame("ControlPage")
+
 
     def generate_final_set(self):
         logic = self.controller.logic  

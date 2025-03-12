@@ -1,0 +1,7 @@
+MCQ: 1. solve this question \[4 x = 10\]
+*2.5
+this is a test
+
+MCQ: 2. solve this question \[2 x = 10\]
+*5.0
+this is a test
