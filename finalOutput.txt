@@ -1,9 +1,0 @@
-MCQ: 1. solve this is  108 x = 10
-*0.09
-this is a test
-54.0
-
-MCQ: 2. here we are 28 x + 6 = 100
-*3.3571
-this is wronmgggg
-34.0

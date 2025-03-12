@@ -1,6 +1,7 @@
 from pathlib import Path
 import tkinter as tk
 from tkinter import Canvas, Button, PhotoImage
+from PIL import Image, ImageDraw, ImageTk 
 import backend.util as util
 
 class IntroPage(tk.Frame):
@@ -59,18 +60,39 @@ class IntroPage(tk.Frame):
             relief="flat"
         )
         button_2.image = button_image_2
-        button_2.place(x=516.0, y=316.0, width=192.0, height=43.0)
+        button_2.place(x=516.0, y=316.0, width=200.0, height=43.0)
         
-        # Create the final button but don't place it yet.
+        
+        self.rounded_bg = self.create_rounded_rectangle_image(
+            width=210,    
+            height=43,
+            radius=10,
+            fill="#2D2D2D" 
+        )
+
         self.final_button = tk.Button(
             self,
-            text="Generate Final H5P Question Set",
-            command=self.generate_final_set,
-            bg="#4CAF50",
-            fg="white",
-            font=("Inter", 16)
+            image=self.rounded_bg,             
+            text="Generate Final H5P",        
+            compound="center",   
+            fg="white",             
+            font=("Inter", 13),
+            borderwidth=0,
+            highlightthickness=0,
+            relief="flat",
+            command=self.generate_final_set, 
+            bg="#2D2D2D", 
+            activebackground="#2D2D2D",
+            activeforeground="white" 
         )
-        
+
+
+    def create_rounded_rectangle_image(self, width, height, radius=15, fill="#2D2D2D"):
+        image = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(image)
+        draw.rounded_rectangle((0, 0, width, height), radius=radius, fill=fill)
+        return ImageTk.PhotoImage(image)
+
     def tkraise(self, aboveThis=None):
         super().tkraise(aboveThis)
         self.update_final_button()
@@ -91,9 +113,7 @@ class IntroPage(tk.Frame):
         util.logger.info("Final H5P Question Set generated.")
 
     def update_final_button(self):
-        # Instead of checking for existing output files,
-        # show the final button only if the user has visited the Parameters page.
         if self.controller.shared_data.get("has_visited_parameters", False):
-            self.final_button.place(x=400.0, y=380.0, width=250.0, height=40.0)
+            self.final_button.place(x=400.0, y=380.0, width=192.0, height=43.0)
         else:
             self.final_button.place_forget()

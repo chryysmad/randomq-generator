@@ -1,9 +1,0 @@
-MCQ: 1. solve this is  108 x = 10
-*0.09
-this is a test
-54.0
-
-MCQ: 2. solve this is  102 x = 10
-*0.1
-this is a test
-51.0
