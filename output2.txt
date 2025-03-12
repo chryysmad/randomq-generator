@@ -1,0 +1,9 @@
+MCQ: 1. This is a new questionn 10 x = 2
+*0.2
+this is wrongggg
+this is a test
+
+MCQ: 2. This is a new questionn 9 x = 2
+*0.2222
+this is a test
+this is wrongggg

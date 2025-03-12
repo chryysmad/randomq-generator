@@ -13,6 +13,7 @@ class BaseApp(tk.Tk):
         self.shared_data = {
             "question_text": None,
             "latex_question": None,
+            "has_visited_parameters": False,
             "parameters": [], 
             "correct_answer": None, 
             "wrong_answers": [], 
@@ -48,6 +49,9 @@ class BaseApp(tk.Tk):
 
     def save_latex_question(self, sympy_expr):
         self.shared_data["latex_question"] = sympy_expr
+    
+    def save_has_visited_parameters(self, bool):
+        self.shared_data["has_visited_parameters"] = bool
 
     def save_parameters(self, parameters):
         self.shared_data["parameters"] = parameters

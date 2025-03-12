@@ -1,7 +1,6 @@
 from pathlib import Path
 import tkinter as tk
 from tkinter import Canvas, Button, PhotoImage
-import glob
 import backend.util as util
 
 class IntroPage(tk.Frame):
@@ -72,8 +71,9 @@ class IntroPage(tk.Frame):
             font=("Inter", 16)
         )
         
-        # Bind an event to update the button every time this frame is shown.
-        self.bind("IntroPage", lambda e: self.update_final_button())
+    def tkraise(self, aboveThis=None):
+        super().tkraise(aboveThis)
+        self.update_final_button()
 
     def relative_to_assets(self, path: str):
         OUTPUT_PATH = Path(__file__).parent
@@ -91,9 +91,9 @@ class IntroPage(tk.Frame):
         util.logger.info("Final H5P Question Set generated.")
 
     def update_final_button(self):
-        # Check for output files using glob.
-        output_files = glob.glob("output*.json")
-        if output_files:
+        # Instead of checking for existing output files,
+        # show the final button only if the user has visited the Parameters page.
+        if self.controller.shared_data.get("has_visited_parameters", False):
             self.final_button.place(x=400.0, y=380.0, width=250.0, height=40.0)
         else:
             self.final_button.place_forget()

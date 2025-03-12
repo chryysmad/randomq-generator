@@ -77,6 +77,7 @@ class ParametersPage(tk.Frame):
 
     def convert_latex_to_sympy(self):
         latex_input = self.entry_1.get("1.0", "end-1c")
+        self.controller.save_has_visited_parameters(True)
         try:
             self.latex_question = sp.sympify(parse_latex(latex_input))
         except Exception as e:
