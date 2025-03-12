@@ -17,8 +17,8 @@ class Logic:
     def __init__(self):
         # Used for naming the output files.
         self.file_counter = 1  
-        self.path_to_output_json = None
-        self.path_to_output_txt = None
+        self.path_to_output_json = "output.json"
+        self.path_to_output_txt = "output.txt"
         self.data = None
         self.precision = 3
 
