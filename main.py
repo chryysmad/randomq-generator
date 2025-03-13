@@ -1,5 +1,9 @@
 import tkinter as tk
 from pathlib import Path
+
+# Add this import for the new ControlPage:
+from build.control import ControlPage
+
 from build.parameters import ParametersPage
 from build.intro import IntroPage
 from build.correct import CorrectPage
@@ -38,7 +42,8 @@ class BaseApp(tk.Tk):
 
         self.frames = {}
 
-        for F in (IntroPage, ParametersPage, CorrectPage, WrongsPage, RandomizerPage):
+        # Insert ControlPage between IntroPage and ParametersPage
+        for F in (IntroPage, ControlPage, ParametersPage, CorrectPage, WrongsPage, RandomizerPage):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -69,6 +74,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Random Question Generator")
     parser.add_argument("--json-path", type=str, help="Path to the JSON file containing the question data.")
     args = parser.parse_args()
+
     if args.json_path:
         json_path = Path(args.json_path)
         print("Multi-input mode enabled.")
@@ -82,6 +88,7 @@ if __name__ == "__main__":
         all_questions = logic_instance.perform_logic_all(data_list)
         print(all_questions)
         exit(0)
+
     app = BaseApp()
     app.resizable(False, False)
     app.mainloop()
