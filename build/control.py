@@ -98,6 +98,7 @@ class ControlPage(tk.Frame):
         2) Go to the ParametersPage.
         """
         self.update_control_file()
+        self.controller.shared_data["has_visited_controller"] = True
         self.controller.show_frame("ParametersPage")
 
     def update_control_file(self):

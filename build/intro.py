@@ -143,7 +143,10 @@ class IntroPage(tk.Frame):
     def set_option(self, option):
         self.selected_option = option
         util.logger.info(f"Selected option: {option}")
-        self.controller.show_frame("ControlPage")
+        if not self.controller.shared_data.get("has_visited_controller", False):
+            self.controller.show_frame("ControlPage")
+        else: 
+            self.controller.show_frame("ParametersPage")
 
     def generate_final_set(self):
         """
