@@ -74,7 +74,7 @@ class ControlPage(tk.Frame):
         self.n_questions_entry.grid(row=7, column=1, padx=(0,20), pady=5, sticky="w")
         self.n_questions_entry.insert(0, "3")
 
-        # Generic action button (will be "Next" or "Back")
+        # Generic action button (will be "Next" or "Back" depending on mode)
         self.action_button = tk.Button(
             self,
             text="Next",  # default text
@@ -86,14 +86,30 @@ class ControlPage(tk.Frame):
             relief="flat"
         )
         self.action_button.grid(row=8, column=0, columnspan=2, pady=20)
+
+        # --- Extra Back Button (always present when NOT in settings mode) ---
+        self.back_button = tk.Button(
+            self,
+            text="Back",
+            font=("Inter", 12),
+            bg="#F5F5F5",
+            fg="#1E1E1E",
+            relief="flat",
+            borderwidth=0,
+            command=self.go_back
+        )
+        self.back_button.grid(row=9, column=0, sticky="w", padx=20, pady=(0,20))
     
     def tkraise(self, aboveThis=None):
         super().tkraise(aboveThis)
-        # Configure the action button based on whether we're in settings mode.
         if self.controller.shared_data.get("in_settings_mode", False):
+            # When in settings mode, configure the action button as "Back" and hide the extra back button.
             self.action_button.config(text="Back", command=self.on_back)
+            self.back_button.grid_remove()
         else:
+            # Otherwise, configure the action button as "Next" and show the extra back button.
             self.action_button.config(text="Next", command=self.on_next)
+            self.back_button.grid()  # Ensure it is shown
 
     def on_next(self):
         """
@@ -113,6 +129,12 @@ class ControlPage(tk.Frame):
         """
         self.update_control_file()
         self.controller.shared_data["in_settings_mode"] = False
+        self.controller.show_frame("IntroPage")
+
+    def go_back(self):
+        """
+        The extra back button returns to the IntroPage.
+        """
         self.controller.show_frame("IntroPage")
 
     def update_control_file(self):

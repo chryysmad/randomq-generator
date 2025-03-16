@@ -44,6 +44,19 @@ class WrongsPage(tk.Frame):
         self.add_entry_field()
         self.create_bottom_section()
 
+        # --- New Back Button (returns to CorrectPage) ---
+        self.back_button = tk.Button(
+            self,
+            text="Back",
+            font=("Inter", 12),
+            bg="#F5F5F5",
+            fg="#1E1E1E",
+            relief="flat",
+            borderwidth=0,
+            command=self.go_back
+        )
+        self.back_button.pack(side="left", padx=10, pady=10)
+
     def relative_to_assets(self, path: str) -> Path:
         ASSETS_PATH = Path(__file__).parent / Path(r"./assets/frame1")
         return ASSETS_PATH / Path(path)
@@ -158,7 +171,6 @@ class WrongsPage(tk.Frame):
         row_frame = tk.Frame(self.inner_frame, bg="#F5F5F5")
         row_frame.grid(row=grid_row, column=0, sticky="w", pady=2)
 
-        # unique label number for this row
         label_num = self.option_counter
         self.option_counter += 1
 
@@ -170,13 +182,11 @@ class WrongsPage(tk.Frame):
         )
         label.grid(row=0, column=0, padx=10, pady=5, sticky="w")
 
-        # <-- NEW: Dropdown to select "text" or "function"
-        type_var = tk.StringVar(value="text")  # default
+        type_var = tk.StringVar(value="text")
         dropdown = tk.OptionMenu(row_frame, type_var, "text", "function")
         dropdown.config(width=8)
         dropdown.grid(row=0, column=1, padx=(0, 5), pady=5, sticky="w")
 
-        # Entry field for the user input
         entry = tk.Entry(
             row_frame, 
             width=50, 
@@ -187,7 +197,6 @@ class WrongsPage(tk.Frame):
         )
         entry.grid(row=0, column=2, padx=5)
 
-        # Optional: placeholder behavior
         new_placeholders = {entry: "Enter the string or LaTeX function..."}
         def on_focus_in(event):
             w = event.widget
@@ -201,13 +210,11 @@ class WrongsPage(tk.Frame):
             if placeholder and w.get() == "":
                 w.insert(0, placeholder)
                 w.config(fg="#C0C0C0")
-
         entry.insert(0, new_placeholders[entry])
         entry.config(fg="#C0C0C0")
         entry.bind("<FocusIn>", on_focus_in)
         entry.bind("<FocusOut>", on_focus_out)
 
-        # Add trash bin if not the first entry
         if len(self.entries) >= 1:
             trash_bin_path = self.relative_to_assets("trash_bin.png")
             trash_bin_image = Image.open(trash_bin_path)
@@ -234,7 +241,7 @@ class WrongsPage(tk.Frame):
             'row_frame': row_frame,
             'label': label,
             'entry': entry,
-            'type_var': type_var,  # <-- NEW: store the dropdown variable
+            'type_var': type_var,
             'label_num': label_num
         }
         self.entries.append(option_frame)
@@ -256,25 +263,21 @@ class WrongsPage(tk.Frame):
         self.wrong_answers.clear()
 
         for option_frame in self.entries:
-            selected_type = option_frame['type_var'].get()  # <-- NEW
+            selected_type = option_frame['type_var'].get()
             text = option_frame['entry'].get().strip()
 
             if not text:
-                # If empty or only placeholder, skip or handle as needed
                 self.wrong_answers.append("")
                 continue
 
             if selected_type == "text":
-                # Treat as a text answer (like t:)
                 self.wrong_answers.append(text)
             else:
-                # Treat as a function (like f:)
                 try:
                     sympy_expr = parse_latex(text)
                     self.wrong_answers.append(sympy_expr)
                 except Exception as e:
                     util.logger.error(f"Error parsing LaTeX: {e}")
-                    # You can append None or keep the raw text if parse fails
                     self.wrong_answers.append(None)
 
         self.collect_wrong_answers()
@@ -286,7 +289,9 @@ class WrongsPage(tk.Frame):
             row_frame.destroy()
         if option_frame in self.entries:
             self.entries.remove(option_frame)
-        # Re-grid the remaining rows
         for new_index, frame_dict in enumerate(self.entries, start=1):
             frame_dict['row_frame'].grid_configure(row=new_index)
         self.update_scroll_region()
+
+    def go_back(self):
+        self.controller.show_frame("CorrectPage")

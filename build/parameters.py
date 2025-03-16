@@ -35,7 +35,7 @@ class ParametersPage(tk.Frame):
             bg="#F5F5F5",
             bd=0,
             highlightthickness=0,
-            height=350  # increased height to accommodate extra textbox
+            height=350
         )
         self.top_canvas.pack(fill="both", expand=True)
         self.create_top_section()
@@ -70,6 +70,19 @@ class ParametersPage(tk.Frame):
         self.bottom_frame.grid(row=2, column=0, sticky="ew", padx=10, pady=10)
         self.create_bottom_section()
 
+        # --- New Back Button (returns to ControlPage) ---
+        self.back_button = tk.Button(
+            self,
+            text="Back",
+            font=("Inter", 12),
+            bg="#F5F5F5",
+            fg="#1E1E1E",
+            relief="flat",
+            borderwidth=0,
+            command=self.go_back
+        )
+        self.back_button.grid(row=3, column=0, sticky="w", padx=20, pady=(0,10))
+
         self.scroll_canvas.bind_all("<MouseWheel>", self._on_mousewheel)
 
     def relative_to_assets(self, path: str) -> Path:
@@ -85,7 +98,6 @@ class ParametersPage(tk.Frame):
             util.logger.error(f"Error parsing LaTeX: {e}")
 
     def create_top_section(self):
-        # --- New Text Box for the Problem Statement ---
         self.top_canvas.create_text(
             24.0,
             10.0,
@@ -94,8 +106,7 @@ class ParametersPage(tk.Frame):
             fill="#1E1E1E",
             font=("Inter", 20 * -1)
         )
-        # Create a new text box with placeholder "Solve this..."
-        self.entry_problem = Text(self.top_frame, bd=0, bg="#FFFFFF", fg="#C0C0C0", highlightthickness=0)
+        self.entry_problem = tk.Text(self.top_frame, bd=0, bg="#FFFFFF", fg="#C0C0C0", highlightthickness=0)
         self.entry_problem.place(x=32.0, y=40.0, width=930.0, height=60)
         self.placeholders[self.entry_problem] = "Solve this..."
         self.entry_problem.insert("1.0", self.placeholders[self.entry_problem])
@@ -106,18 +117,15 @@ class ParametersPage(tk.Frame):
             if placeholder and widget.get("1.0", "end-1c") == placeholder:
                 widget.delete("1.0", "end")
                 widget.config(fg="#000716")
-
         def on_focus_out_problem(event):
             widget = event.widget
             placeholder = self.placeholders.get(widget)
             if placeholder and widget.get("1.0", "end-1c") == "":
                 widget.insert("1.0", placeholder)
                 widget.config(fg="#C0C0C0")
-
         self.entry_problem.bind("<FocusIn>", on_focus_in_problem)
         self.entry_problem.bind("<FocusOut>", on_focus_out_problem)
 
-        # --- Existing LaTeX Question Section ---
         self.top_canvas.create_text(
             24.0,
             110.0,
@@ -138,9 +146,8 @@ class ParametersPage(tk.Frame):
         self.entry_image_1 = PhotoImage(file=entry_image_1_path)
         self.top_canvas.create_image(497.0, 238.5, image=self.entry_image_1)
 
-        self.entry_1 = Text(self.top_frame, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
+        self.entry_1 = tk.Text(self.top_frame, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
         self.entry_1.place(x=32.0, y=170.0, width=930.0, height=115.0)
-        
         self.placeholders[self.entry_1] = "Add here..."
         def on_focus_in(event):
             entry = event.widget
@@ -148,28 +155,21 @@ class ParametersPage(tk.Frame):
             if placeholder and entry.get("1.0", "end-1c") == placeholder:
                 entry.delete("1.0", "end")
                 entry.config(fg="#000716")
-
         def on_focus_out(event):
             entry = event.widget
             placeholder = self.placeholders.get(entry)
             if placeholder and entry.get("1.0", "end-1c") == "":
                 entry.insert("1.0", placeholder)
                 entry.config(fg="#C0C0C0")
-
         self.entry_1.bind("<FocusIn>", on_focus_in)
         self.entry_1.bind("<FocusOut>", on_focus_out)
         self.entry_1.insert("1.0", self.placeholders[self.entry_1])
         self.entry_1.config(fg="#C0C0C0")
         
-        # --- New Input Box for Precision ---
-        # Define a validation function to allow only digits.
         def validate_digit(P):
             return P.isdigit() or P == ""
-        
         vcmd = self.register(validate_digit)
-        # Leave some vertical space
         self.top_canvas.create_line(0, 295, 1000, 295, fill="#F5F5F5")
-        # Create a label for the precision input
         self.top_canvas.create_text(
             32.0,
             295.0,
@@ -178,7 +178,6 @@ class ParametersPage(tk.Frame):
             fill="#1E1E1E",
             font=("Inter", 16 * -1)
         )
-        # Create the precision entry box, placed to the right of the label.
         self.precision_entry = tk.Entry(
             self.top_frame,
             bd=0,
@@ -189,8 +188,8 @@ class ParametersPage(tk.Frame):
             validatecommand=(vcmd, '%P')
         )
         self.precision_entry.place(x=150.0, y=290.0, width=100.0, height=30)
-        self.precision_entry.insert(0, "0")  # Default value
-
+        self.precision_entry.insert(0, "0")
+        
     def create_bottom_section(self):
         self.button_image_1 = PhotoImage(file=self.relative_to_assets("button_1.png"))
         self.button_image_2 = PhotoImage(file=self.relative_to_assets("button_2.png"))
@@ -226,8 +225,6 @@ class ParametersPage(tk.Frame):
 
     def add_parameter_row(self):
         grid_row = len(self.entries) + 1
-
-        # container frame for the entire row
         row_frame = tk.Frame(self.inner_frame, bg="#F5F5F5")
         row_frame.grid(row=grid_row, column=0, columnspan=11, sticky="w", pady=2)
 
@@ -366,3 +363,6 @@ class ParametersPage(tk.Frame):
                 row.grid_configure(row=new_row_index)
 
         self.update_scroll_region()
+
+    def go_back(self):
+        self.controller.show_frame("ControlPage")

@@ -9,7 +9,6 @@ class RandomizerPage(tk.Frame):
         super().__init__(parent)
         self.controller = controller
         self.configure(bg="#F5F5F5")
-        # Create and store a persistent Logic instance on the controller.
         if not hasattr(self.controller, "logic"):
             self.controller.logic = Logic()
         self.logic = self.controller.logic
@@ -83,6 +82,19 @@ class RandomizerPage(tk.Frame):
         self.button_1.place(x=402.0, y=299.0, width=190.0, height=34.0)
         self.canvas.pack()
 
+        # --- New Back Button (returns to CorrectPage) ---
+        self.back_button = tk.Button(
+            self,
+            text="Back",
+            font=("Inter", 12),
+            bg="#F5F5F5",
+            fg="#1E1E1E",
+            relief="flat",
+            borderwidth=0,
+            command=self.go_back
+        )
+        self.back_button.place(x=20, y=500)
+
     def save_randomization_count(self):
         self.controller.shared_data["randomization_count"] = self.randomization_count
 
@@ -93,6 +105,8 @@ class RandomizerPage(tk.Frame):
             self.randomization_count = 0
         self.save_randomization_count()
         self.logic.perform_logic(self.controller.shared_data)
-        # Update shared file_counter so IntroPage can display the final button.
         self.controller.shared_data["file_counter"] = self.logic.file_counter
         self.controller.show_frame("IntroPage")
+
+    def go_back(self):
+        self.controller.show_frame("CorrectPage")
