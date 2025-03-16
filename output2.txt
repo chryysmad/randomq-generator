@@ -1,0 +1,14 @@
+MCQ: 1. solve the  \[9 x = 81\]
+*9.0
+this is a test
+-72.0
+
+MCQ: 2. solve the  \[6 x = 88\]
+*14.7
+-82.0
+this is a test
+
+MCQ: 3. solve the  \[11 x = 105\]
+*9.5
+-94.0
+this is a test
