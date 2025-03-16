@@ -47,7 +47,6 @@ class Logic:
             original_formula = f"\\[{original_formula}\\]"
             if q.get("wrong_answers"):
                 header = f"MCQ: {idx}. {question_text} {original_formula}"
-                # Ensure raw LaTeX (remove extra backslashes)
                 lines.append(header.replace('\\\\', '\\'))  
                 lines.append(f"*{q.get('correct_answer')}")
                 for wa in q.get("wrong_answers"):
@@ -61,12 +60,28 @@ class Logic:
         with open(self.path_to_output_txt, 'w') as f:
             f.write("\n".join(lines))
 
-    def generate_h5p(self):
+    def generate_h5p(self, h5p_id=""):
         """
-        Generates a single H5P file from whatever is in self.path_to_output_txt,
-        using the txt2h5p library.
+        Generates a single H5P file from self.path_to_output_txt using the txt2h5p parser.
+        After generation, renames the file by appending h5p_id to the base name.
         """
+        # Generate the H5P file using the control file.
         h5p_parser.generate("./backend/txt2h5p/control.txt", self.path_to_output_txt)
+        # Assume the control file defines a title that becomes the base name.
+        base_name = "example-file"  # Modify this if you want to extract the title from the control file.
+        default_output = f"{base_name}.h5p"
+        # Determine the new file name by appending the ID.
+        if h5p_id:
+            new_name = f"{base_name}{h5p_id}.h5p"
+        else:
+            new_name = default_output
+
+        # If the generated file exists, rename it to avoid overwriting.
+        if os.path.exists(default_output):
+            os.rename(default_output, new_name)
+            util.logger.info(f"Renamed {default_output} to {new_name}")
+        else:
+            util.logger.error(f"Expected H5P file {default_output} not found.")
 
     def randomize_parameters(self, parameters):
         if not parameters:
@@ -243,7 +258,7 @@ class Logic:
     def generate_final_h5p_set(self, times=1):
         """
         Gathers one random question from each output*.json, writes them to finalOutput_i.json/.txt,
-        and calls the H5P generator times times. For each iteration, we produce a separate final H5P.
+        and calls the H5P generator 'times' times. For each iteration, we produce a separate final H5P.
         """
         for i in range(times):
             final_questions = []
@@ -283,8 +298,8 @@ class Logic:
 
             # Update self.path_to_output_txt to point to this iteration's TXT file
             self.path_to_output_txt = final_txt
-            # Now generate the H5P for this iteration
-            self.generate_h5p()
+            # Now generate the H5P for this iteration with an appended ID.
+            self.generate_h5p(h5p_id=i+1)
 
             util.logger.info(f"Generated final H5P set #{i+1} -> {final_json}, {final_txt}")
 
@@ -446,5 +461,5 @@ if __name__ == "__main__":
     print("Generated questions:", questions)
 
     # Example usage of generating multiple final H5Ps:
-    # This will produce finalOutput_1.json/.txt/.h5p, finalOutput_2.json/.txt/.h5p, ...
+    # This will produce finalOutput_1.json/.txt and then generate final H5Ps as example-file1.h5p, example-file2.h5p, etc.
     logic_instance.generate_final_h5p_set(times=2)
