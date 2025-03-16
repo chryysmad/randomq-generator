@@ -1,9 +1,0 @@
-MCQ: 1. solve this 5 x = 10
-*2.0
-2.5
-wrongggg
-
-MCQ: 2. solve this 3 x = 7
-*2.3
-test this is wrong
--4.0
