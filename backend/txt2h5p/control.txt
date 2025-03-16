@@ -1,5 +1,5 @@
 NAME_H5P: example-file.h5p
-TITLE: "This is the Title of the Quiz!"
+TITLE: "this is a test"
 AUTHOR: "chryysmad"
 LICENSE: "ODC PDDL"
 INTRODUCTION: "An H5P Question Set made with txt2h5p-generator..."
