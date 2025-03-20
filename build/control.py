@@ -1,5 +1,4 @@
 # File: control.py
-
 import tkinter as tk
 from pathlib import Path
 import backend.util as util
@@ -10,7 +9,7 @@ class ControlPage(tk.Frame):
         self.controller = controller
         self.configure(bg="#F5F5F5")
 
-        # A title label
+        # Title label
         label_title = tk.Label(
             self,
             text="H5P Control Settings",
@@ -49,9 +48,7 @@ class ControlPage(tk.Frame):
         )
         self.intro_entry = tk.Entry(self, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0, width=60)
         self.intro_entry.grid(row=4, column=1, padx=(0,20), pady=5, sticky="w")
-        self.intro_entry.insert(
-            0, "An H5P Question Set made with txt2h5p-generator..."
-        )
+        self.intro_entry.insert(0, "An H5P Question Set made with txt2h5p-generator...")
 
         # PASS_PERCENTAGE
         tk.Label(self, text="PASS_PERCENTAGE:", font=("Inter", 16), bg="#F5F5F5").grid(
@@ -77,32 +74,72 @@ class ControlPage(tk.Frame):
         self.n_questions_entry.grid(row=7, column=1, padx=(0,20), pady=5, sticky="w")
         self.n_questions_entry.insert(0, "3")
 
-        # Next button
-        button_next = tk.Button(
+        # Generic action button (will be "Next" or "Back" depending on mode)
+        self.action_button = tk.Button(
             self,
-            text="Next",
+            text="Next",  # default text
             font=("Inter", 14, "bold"),
             bg="#2D2D2D",
             fg="white",
             borderwidth=0,
             highlightthickness=0,
-            relief="flat",
-            command=self.on_next
+            relief="flat"
         )
-        button_next.grid(row=8, column=0, columnspan=2, pady=20)
+        self.action_button.grid(row=8, column=0, columnspan=2, pady=20)
+
+        # --- Extra Back Button (always present when NOT in settings mode) ---
+        self.back_button = tk.Button(
+            self,
+            text="Back",
+            font=("Inter", 12),
+            bg="#F5F5F5",
+            fg="#1E1E1E",
+            relief="flat",
+            borderwidth=0,
+            command=self.go_back
+        )
+        self.back_button.grid(row=9, column=0, sticky="w", padx=20, pady=(0,20))
+    
+    def tkraise(self, aboveThis=None):
+        super().tkraise(aboveThis)
+        if self.controller.shared_data.get("in_settings_mode", False):
+            # When in settings mode, configure the action button as "Back" and hide the extra back button.
+            self.action_button.config(text="Back", command=self.on_back)
+            self.back_button.grid_remove()
+        else:
+            # Otherwise, configure the action button as "Next" and show the extra back button.
+            self.action_button.config(text="Next", command=self.on_next)
+            self.back_button.grid()  # Ensure it is shown
 
     def on_next(self):
         """
-        When user clicks 'Next':
-        1) Overwrite control.txt with new fields (keeping the rest as defaults).
-        2) Go to the ParametersPage.
+        When the user clicks 'Next':
+          - Save control file changes.
+          - Set flags indicating that the control page was visited.
+          - Move to the ParametersPage.
         """
         self.update_control_file()
+        self.controller.shared_data["has_visited_controller"] = True
+        self.controller.shared_data["in_settings_mode"] = False
         self.controller.show_frame("ParametersPage")
+
+    def on_back(self):
+        """
+        When in settings mode, clicking 'Back' saves changes and returns to the IntroPage.
+        """
+        self.update_control_file()
+        self.controller.shared_data["in_settings_mode"] = False
+        self.controller.show_frame("IntroPage")
+
+    def go_back(self):
+        """
+        The extra back button returns to the IntroPage.
+        """
+        self.controller.show_frame("IntroPage")
 
     def update_control_file(self):
         """
-        Overwrites backend/txt2h5p/control.txt with user-specified fields + default hardcoded ones.
+        Overwrites backend/txt2h5p/control.txt with user-specified fields plus defaults.
         """
         name_h5p = self.name_h5p_entry.get().strip()
         title = self.title_entry.get().strip()
@@ -112,7 +149,7 @@ class ControlPage(tk.Frame):
         pool_size = self.pool_size_entry.get().strip() or "3"
         n_questions = self.n_questions_entry.get().strip() or "3"
 
-        # Hardcoded defaults for the rest
+        # Hardcoded defaults for the remaining fields.
         LICENSE = "ODC PDDL"
         DISABLE_BACKWARDS_NAVIGATION = "false"
         RANDOM_QUESTIONS = "true"

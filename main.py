@@ -21,6 +21,7 @@ class BaseApp(tk.Tk):
             "question_text": None,
             "latex_question": None,
             "has_visited_parameters": False,
+            "has_visited_controller": False, 
             "parameters": [], 
             "correct_answer": None, 
             "wrong_answers": [], 

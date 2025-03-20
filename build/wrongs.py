@@ -40,8 +40,22 @@ class WrongsPage(tk.Frame):
         self.bottom_frame = tk.Frame(self, bg="#F5F5F5")
         self.bottom_frame.pack(side="bottom", fill="x")
 
-        self.add_entry_field()  # always create one row at start
+        # always create one row at start
+        self.add_entry_field()
         self.create_bottom_section()
+
+        # --- New Back Button (returns to CorrectPage) ---
+        self.back_button = tk.Button(
+            self,
+            text="Back",
+            font=("Inter", 12),
+            bg="#F5F5F5",
+            fg="#1E1E1E",
+            relief="flat",
+            borderwidth=0,
+            command=self.go_back
+        )
+        self.back_button.pack(side="left", padx=10, pady=10)
 
     def relative_to_assets(self, path: str) -> Path:
         ASSETS_PATH = Path(__file__).parent / Path(r"./assets/frame1")
@@ -60,9 +74,8 @@ class WrongsPage(tk.Frame):
         description = tk.Label(
             self.top_frame,
             text=(
-                "Here you can set either the answer text (t:) to be parsed as a string or the answer "
-                "function (f:) in terms of the parameters given in the previous page to calculate "
-                "the wrong answer option."
+                "Use the dropdown to choose whether the answer is text or a function. "
+                "The function can be written in LaTeX for parsing."
             ),
             bg="#F5F5F5", 
             fg="#757575", 
@@ -140,7 +153,6 @@ class WrongsPage(tk.Frame):
 
     def update_scroll_region(self, event=None):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-
         if hasattr(self, 'answer_number_spinbox'):
             new_max = len(self.entries) if len(self.entries) > 0 else 1
             self.answer_number_spinbox.config(to=new_max)
@@ -159,7 +171,6 @@ class WrongsPage(tk.Frame):
         row_frame = tk.Frame(self.inner_frame, bg="#F5F5F5")
         row_frame.grid(row=grid_row, column=0, sticky="w", pady=2)
 
-        # unique label number for this row
         label_num = self.option_counter
         self.option_counter += 1
 
@@ -171,6 +182,11 @@ class WrongsPage(tk.Frame):
         )
         label.grid(row=0, column=0, padx=10, pady=5, sticky="w")
 
+        type_var = tk.StringVar(value="text")
+        dropdown = tk.OptionMenu(row_frame, type_var, "text", "function")
+        dropdown.config(width=8)
+        dropdown.grid(row=0, column=1, padx=(0, 5), pady=5, sticky="w")
+
         entry = tk.Entry(
             row_frame, 
             width=50, 
@@ -179,9 +195,9 @@ class WrongsPage(tk.Frame):
             fg="#000716", 
             highlightthickness=0
         )
-        entry.grid(row=0, column=1, padx=5)
+        entry.grid(row=0, column=2, padx=5)
 
-        new_placeholders = {entry: "Enter the string or function here..."}
+        new_placeholders = {entry: "Enter the string or LaTeX function..."}
         def on_focus_in(event):
             w = event.widget
             placeholder = new_placeholders.get(w)
@@ -208,7 +224,7 @@ class WrongsPage(tk.Frame):
 
             trash_button_frame = tk.Frame(row_frame, width=desired_width + 10, height=desired_height + 10, bg="#F5F5F5")
             trash_button_frame.grid_propagate(False)
-            trash_button_frame.grid(row=0, column=2, padx=5, pady=2)
+            trash_button_frame.grid(row=0, column=3, padx=5, pady=2)
 
             trash_button = tk.Button(
                 trash_button_frame,
@@ -225,7 +241,8 @@ class WrongsPage(tk.Frame):
             'row_frame': row_frame,
             'label': label,
             'entry': entry,
-            'label_num': label_num  
+            'type_var': type_var,
+            'label_num': label_num
         }
         self.entries.append(option_frame)
         self.update_scroll_region()
@@ -244,20 +261,25 @@ class WrongsPage(tk.Frame):
 
     def process_entries_and_continue(self):
         self.wrong_answers.clear()
+
         for option_frame in self.entries:
+            selected_type = option_frame['type_var'].get()
             text = option_frame['entry'].get().strip()
-            if text.startswith("t:"):
-                self.wrong_answers.append(text[2:].strip())
-            elif text.startswith("f:"):
-                latex_str = text[2:].strip()
+
+            if not text:
+                self.wrong_answers.append("")
+                continue
+
+            if selected_type == "text":
+                self.wrong_answers.append(text)
+            else:
                 try:
-                    sympy_expr = parse_latex(latex_str)
+                    sympy_expr = parse_latex(text)
                     self.wrong_answers.append(sympy_expr)
                 except Exception as e:
                     util.logger.error(f"Error parsing LaTeX: {e}")
                     self.wrong_answers.append(None)
-            else:
-                self.wrong_answers.append(text)
+
         self.collect_wrong_answers()
         self.controller.show_frame("RandomizerPage")
 
@@ -270,3 +292,6 @@ class WrongsPage(tk.Frame):
         for new_index, frame_dict in enumerate(self.entries, start=1):
             frame_dict['row_frame'].grid_configure(row=new_index)
         self.update_scroll_region()
+
+    def go_back(self):
+        self.controller.show_frame("CorrectPage")

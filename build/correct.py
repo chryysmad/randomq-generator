@@ -21,7 +21,7 @@ class CorrectPage(tk.Frame):
         def relative_to_assets(path: str) -> Path:
             return ASSETS_PATH / Path(path)
 
-        canvas = tk.Canvas(
+        self.canvas = tk.Canvas(
             self,
             bg="#F5F5F5",
             height=547,
@@ -30,8 +30,8 @@ class CorrectPage(tk.Frame):
             highlightthickness=0,
             relief="ridge"
         )
-        canvas.place(x=0, y=0)
-        canvas.create_text(
+        self.canvas.place(x=0, y=0)
+        self.canvas.create_text(
             24.0,
             87.0,
             anchor="nw",
@@ -40,7 +40,7 @@ class CorrectPage(tk.Frame):
             font=("Inter", 20 * -1)
         )
 
-        canvas.create_text(
+        self.canvas.create_text(
             24.0,
             123.0,
             anchor="nw",
@@ -49,7 +49,7 @@ class CorrectPage(tk.Frame):
             font=("Inter", 16 * -1)
         )
 
-        canvas.create_text(
+        self.canvas.create_text(
             24.0,
             145.0,
             anchor="nw",
@@ -58,7 +58,6 @@ class CorrectPage(tk.Frame):
             font=("Inter", 16 * -1)
         )
 
-        # Make radio_value an instance variable (self.radio_value)
         self.radio_value = tk.StringVar(value="auto")
 
         font_setting = ("Inter", 16 * -1)
@@ -97,7 +96,7 @@ class CorrectPage(tk.Frame):
         )
         radio_function.place(x=503.0, y=211.0)
 
-        canvas.create_text(
+        self.canvas.create_text(
             174.0,
             333.0,
             anchor="nw",
@@ -107,7 +106,7 @@ class CorrectPage(tk.Frame):
         )
 
         entry_image_1 = tk.PhotoImage(file=relative_to_assets("entry_1.png"))
-        entry_bg_1 = canvas.create_image(497.0, 344.5, image=entry_image_1)
+        entry_bg_1 = self.canvas.create_image(497.0, 344.5, image=entry_image_1)
         entry_1 = tk.Entry(self, bd=0, bg="#FFFFFF", fg="#C0C0C0", highlightthickness=0)
         entry_1.place(x=272.0, y=323.0, width=450.0, height=41.0)
 
@@ -147,28 +146,37 @@ class CorrectPage(tk.Frame):
             relief="flat"
         )
         button_1.place(x=402.0, y=414.0, width=190.0, height=34.0)
-
         self.button_image_1 = button_image_1
 
-        canvas.pack()
+        self.canvas.pack()
 
         update_entry_state()
+
+        # --- New Back Button (returns to ParametersPage) ---
+        self.back_button = tk.Button(
+            self,
+            text="Back",
+            font=("Inter", 12),
+            bg="#F5F5F5",
+            fg="#1E1E1E",
+            relief="flat",
+            borderwidth=0,
+            command=self.go_back
+        )
+        self.back_button.place(x=20, y=500)  # Adjust position as needed
 
     def convert_latex_to_sympy(self, latex_str):
         try:
             self.function_sympy = parse_latex(latex_str)
-
         except Exception as e:
             util.logger.error(f"Error converting LaTeX to SymPy: {e}")
 
     def go_to_next_page(self):
         answer_mode = self.radio_value.get()
-    
         correct_answer_data = {
             "answer_mode": answer_mode,
             "function": self.function_sympy if answer_mode == "function" else None 
         }
-
         self.controller.shared_data["correct_answer"] = correct_answer_data
 
         intro_page = self.controller.frames["IntroPage"]
@@ -178,3 +186,6 @@ class CorrectPage(tk.Frame):
             self.controller.show_frame("WrongsPage")
         elif selected_option == "FIB":
             self.controller.show_frame("RandomizerPage")
+
+    def go_back(self):
+        self.controller.show_frame("ParametersPage")

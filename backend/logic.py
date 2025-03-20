@@ -2,7 +2,9 @@ import random
 import glob
 import sympy as sp
 import json
+import os
 from sympy.parsing.latex import parse_latex
+
 try:
     import backend.txt2h5p.parser as h5p_parser
 except ModuleNotFoundError:
@@ -32,32 +34,54 @@ class Logic:
 
         with open(self.path_to_output_json, 'w') as f:
             json_data = json.dumps(data, indent=4, default=default_converter)
-            json_data = json_data.replace('\\\\', '\\')  # Replace double backslashes with a single backslash
+            # Replace double backslashes with a single backslash
+            json_data = json_data.replace('\\\\', '\\')
             f.write(json_data)
 
     def save_to_txt(self, questions):
         lines = []
         for idx, q in enumerate(questions, start=1):
             question_text = q.get("question_text")
-            original_formula = q.get("original_formula")
+            original_formula = q.get("original_formula", "")
+            # Wrap formula in LaTeX brackets
             original_formula = f"\\[{original_formula}\\]"
             if q.get("wrong_answers"):
                 header = f"MCQ: {idx}. {question_text} {original_formula}"
-                lines.append(header.replace('\\\\', '\\'))  # Ensure raw LaTeX
+                lines.append(header.replace('\\\\', '\\'))  
                 lines.append(f"*{q.get('correct_answer')}")
                 for wa in q.get("wrong_answers"):
                     lines.append(f"{wa}")
             else:
                 header = f"FIB: {idx}. {question_text} {original_formula}"
-                lines.append(header.replace('\\\\', '\\'))  # Ensure raw LaTeX
+                lines.append(header.replace('\\\\', '\\'))  
                 lines.append(f"=> *{q.get('correct_answer')}*")
             lines.append("")
-            
+
         with open(self.path_to_output_txt, 'w') as f:
             f.write("\n".join(lines))
 
-    def generate_h5p(self):
+    def generate_h5p(self, h5p_id=""):
+        """
+        Generates a single H5P file from self.path_to_output_txt using the txt2h5p parser.
+        After generation, renames the file by appending h5p_id to the base name.
+        """
+        # Generate the H5P file using the control file.
         h5p_parser.generate("./backend/txt2h5p/control.txt", self.path_to_output_txt)
+        # Assume the control file defines a title that becomes the base name.
+        base_name = "example-file"  # Modify this if you want to extract the title from the control file.
+        default_output = f"{base_name}.h5p"
+        # Determine the new file name by appending the ID.
+        if h5p_id:
+            new_name = f"{base_name}{h5p_id}.h5p"
+        else:
+            new_name = default_output
+
+        # If the generated file exists, rename it to avoid overwriting.
+        if os.path.exists(default_output):
+            os.rename(default_output, new_name)
+            util.logger.info(f"Renamed {default_output} to {new_name}")
+        else:
+            util.logger.error(f"Expected H5P file {default_output} not found.")
 
     def randomize_parameters(self, parameters):
         if not parameters:
@@ -68,7 +92,7 @@ class Logic:
             param_name = param.get('name')
             if not param_name:
                 continue
-                
+
             try:
                 range_from = int(param.get('range_from', 0))
                 range_to = int(param.get('range_to', 0))
@@ -144,23 +168,21 @@ class Logic:
             expr = sp.sympify(latex_question)
 
         substituted_expr = expr.subs(randomized_params)  # Substitute parameters before storing
-        original_formula_latex = sp.latex(substituted_expr)  # Convert to LaTeX without simplification
+        original_formula_latex = sp.latex(substituted_expr)  # Convert to LaTeX
 
         evaluated_value = self.evaluate_expression(expr, randomized_params)
 
         return {
             'correct_answer': evaluated_value,
-            'original_formula': original_formula_latex  # This stores the exact substituted expression
+            'original_formula': original_formula_latex  # exact substituted expression in LaTeX
         }
 
     def process_wrong_answers(self, wrong_answers, randomized_params, answer_number):
         wrong_options = []
         for wrong_item in wrong_answers:
             try:
-                # Convert string expressions to SymPy expressions for proper substitution
+                # Convert string expressions to SymPy expressions
                 wrong_expr = sp.sympify(wrong_item)
-
-                # Substitute parameters and evaluate
                 substituted_expr = wrong_expr.subs(randomized_params)
                 evaluated_val = self.evaluate_expression(substituted_expr, randomized_params)
                 original_wrong_expr_latex = sp.latex(substituted_expr)
@@ -170,7 +192,7 @@ class Logic:
                     "formula": original_wrong_expr_latex
                 })
             except (sp.SympifyError, TypeError, ValueError):
-                # Handle cases where wrong_item is not a mathematical expression
+                # If it's not a valid math expression, store raw text
                 wrong_options.append({
                     "value": wrong_item,
                     "formula": wrong_item
@@ -183,7 +205,6 @@ class Logic:
         final_wrong_values = [opt["value"] for opt in final_wrong_options]
         final_wrong_formulas = [opt["formula"] for opt in final_wrong_options]
         return final_wrong_values, final_wrong_formulas
-
 
     def perform_logic(self, data):
         self.data = data
@@ -208,7 +229,7 @@ class Logic:
             randomized_params = self.randomize_parameters(parameters)
             correct_data = self.process_correct_answer(correct_answer_data, latex_question, randomized_params)
             question_dict = {
-                'identifier': i + 1,   # Each question gets its own sequential ID.
+                'identifier': i + 1,
                 'question_text': question_text,
                 'randomized_params': randomized_params,
                 'correct_answer': correct_data['correct_answer'],
@@ -222,54 +243,65 @@ class Logic:
             else:
                 question_dict['wrong_answers'] = []
                 question_dict['wrong_formulas'] = []
+
             random_questions.append(question_dict)
 
-        # Name the output files using the current file_counter.
+        # Name the output files using the current file_counter
         self.path_to_output_json = f"output{self.file_counter}.json"
         self.path_to_output_txt = f"output{self.file_counter}.txt"
         self.save_to_file(random_questions)
         self.save_to_txt(random_questions)
-        # Removed redundant H5P generation here.
-        # self.generate_h5p()
-        # Increment the file counter for the next generation.
+        # Increment the file counter for the next generation
         self.file_counter += 1
         return random_questions
 
-    def generate_final_h5p_set(self):
+    def generate_final_h5p_set(self, times=1):
         """
-        Gathers one random question from each output file (output*.json),
-        writes the final JSON and TXT, and then runs the H5P generator.
+        Gathers one random question from each output*.json, writes them to finalOutput_i.json/.txt,
+        and calls the H5P generator 'times' times. For each iteration, we produce a separate final H5P.
         """
-        final_questions = []
-        for filename in sorted(glob.glob("output*.json"), key=lambda x: int(''.join(filter(str.isdigit, x)))):
-            with open(filename, 'r') as f:
-                questions = json.load(f)
-            if questions:
-                final_questions.append(random.choice(questions))
-        final_json = "finalOutput.json"
-        final_txt = "finalOutput.txt"
-        with open(final_json, 'w') as f:
-            json.dump(final_questions, f, indent=4)
-        lines = []
-        for idx, q in enumerate(final_questions, start=1):
-            question_text = q.get("question_text")
-            substituted_text = q.get("original_formula")
-            if q.get("wrong_answers"):
-                header = f"MCQ: {idx}. {question_text} {substituted_text}"
-                lines.append(header)
-                lines.append(f"*{q.get('correct_answer')}")
-                for wa in q.get("wrong_answers"):
-                    lines.append(f"{wa}")
-            else:
-                header = f"FIB: {idx}. {question_text} {substituted_text}"
-                lines.append(header)
-                lines.append(f"=> *{q.get('correct_answer')}*")
-            lines.append("")
-        with open(final_txt, 'w') as f:
-            f.write("\n".join(lines))
-        self.path_to_output_txt = final_txt
-        self.generate_h5p()
+        for i in range(times):
+            final_questions = []
+            # Gather one random question from each output*.json
+            for filename in sorted(glob.glob("output*.json"), 
+                                   key=lambda x: int(''.join(filter(str.isdigit, x))) or 0):
+                with open(filename, 'r') as f:
+                    questions = json.load(f)
+                if questions:
+                    final_questions.append(random.choice(questions))
 
+            # Write this set to a unique JSON / TXT file
+            final_json = f"finalOutput_{i+1}.json"
+            final_txt = f"finalOutput_{i+1}.txt"
+
+            with open(final_json, 'w') as f:
+                json.dump(final_questions, f, indent=4)
+
+            lines = []
+            for idx, q in enumerate(final_questions, start=1):
+                question_text = q.get("question_text")
+                substituted_text = q.get("original_formula", "")
+                if q.get("wrong_answers"):
+                    header = f"MCQ: {idx}. {question_text} {substituted_text}"
+                    lines.append(header)
+                    lines.append(f"*{q.get('correct_answer')}")
+                    for wa in q.get("wrong_answers"):
+                        lines.append(f"{wa}")
+                else:
+                    header = f"FIB: {idx}. {question_text} {substituted_text}"
+                    lines.append(header)
+                    lines.append(f"=> *{q.get('correct_answer')}*")
+                lines.append("")
+
+            with open(final_txt, 'w') as f:
+                f.write("\n".join(lines))
+
+            # Update self.path_to_output_txt to point to this iteration's TXT file
+            self.path_to_output_txt = final_txt
+            # Now generate the H5P for this iteration with an appended ID.
+            self.generate_h5p(h5p_id=i+1)
+
+            util.logger.info(f"Generated final H5P set #{i+1} -> {final_json}, {final_txt}")
 
     def perform_logic_all(self, data_list):
         """
@@ -304,7 +336,7 @@ class Logic:
                     'question_text': question_text,
                     'randomized_params': randomized_params,
                     'correct_answer': correct_data['correct_answer'],
-                    'original_formula': substitued_expr  # Ensure substitution is applied
+                    'original_formula': substitued_expr
                 }
 
                 if wrong_answers:
@@ -323,6 +355,10 @@ class Logic:
 
         return all_questions
 
+
+# -------------------------------
+# Example usage / test (optional)
+# -------------------------------
 if __name__ == "__main__":
     logic_instance = Logic()
 
@@ -392,7 +428,7 @@ if __name__ == "__main__":
         "precision": 3
     }
 
-    # Example integral question (to show it automatically uses doit())
+    # Example integral question
     data_integral = {
         "question_text": "Compute the definite integral from 0 to a:",
         "latex_question": "Integral(x**2, (x, 0, a))",
@@ -419,7 +455,11 @@ if __name__ == "__main__":
         "precision": 3
     }
 
-    # To test processing multiple questions at once:
+    # Process multiple question definitions at once
     sample_data = [data_mcq, data_fib, data_integral]
     questions = logic_instance.perform_logic_all(sample_data)
-    print(questions)
+    print("Generated questions:", questions)
+
+    # Example usage of generating multiple final H5Ps:
+    # This will produce finalOutput_1.json/.txt and then generate final H5Ps as example-file1.h5p, example-file2.h5p, etc.
+    logic_instance.generate_final_h5p_set(times=2)
