@@ -1,5 +1,5 @@
 # randomq-generator
-This repository contains a GUI application that generates a pool of randomized .txt question files based on user-defined functions and parameters. 
+This repository contains a GUI application that generates a pool of randomized .txt and h5p question files based on user-defined latex functions and parameters. 
 
 ### Notice 
 This project was created by [chryysmad](https://github.com/chryysmad) and [shadygm](https://github.com/shadygm) as part of [Tamás Görbe's](https://www.rug.nl/staff/t.f.gorbe/?lang=en) Project Calculus, that aims for the creation of an adaptive educational tool that will enhance student engagement and success in Calculus.
