@@ -22,7 +22,7 @@ class Logic:
         self.path_to_output_json = "output.json"
         self.path_to_output_txt = "output.txt"
         self.data = None
-        self.precision = 3
+        self.precision = 0
 
     def save_to_file(self, data):
         def default_converter(obj):
@@ -52,9 +52,8 @@ class Logic:
                 for wa in q.get("wrong_answers"):
                     lines.append(f"{wa}")
             else:
-                header = f"FIB: {idx}. {question_text} {original_formula}"
+                header = f"FIB: {idx}. {question_text} {original_formula} = *{q.get('correct_answer')}*"
                 lines.append(header.replace('\\\\', '\\'))  
-                lines.append(f"=> *{q.get('correct_answer')}*")
             lines.append("")
 
         with open(self.path_to_output_txt, 'w') as f:
@@ -146,7 +145,10 @@ class Logic:
 
         try:
             numeric_value = float(numeric_value)
-            numeric_value = round(numeric_value, self.precision)
+            if self.precision > 0:
+                numeric_value = round(numeric_value, self.precision)
+            else:
+                numeric_value = int(numeric_value)
         except (TypeError, ValueError):
             pass
 
@@ -215,6 +217,8 @@ class Logic:
             precision = int(data.get("precision"))
             if precision > 0:
                 self.precision = precision
+            else:
+                self.precision = 0
         except (TypeError, ValueError):
             util.logger.error(f"Invalid precision value: {data.get('precision')}")
 
