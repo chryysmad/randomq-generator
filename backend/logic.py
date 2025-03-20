@@ -247,8 +247,12 @@ class Logic:
             random_questions.append(question_dict)
 
         # Name the output files using the current file_counter
-        self.path_to_output_json = f"output{self.file_counter}.json"
-        self.path_to_output_txt = f"output{self.file_counter}.txt"
+        self.path_to_output_json = f"data/output{self.file_counter}.json"
+        self.path_to_output_txt = f"data/output{self.file_counter}.txt"
+
+        # Generate the files first
+        os.makedirs("data", exist_ok=True)
+
         self.save_to_file(random_questions)
         self.save_to_txt(random_questions)
         # Increment the file counter for the next generation
@@ -263,7 +267,7 @@ class Logic:
         for i in range(times):
             final_questions = []
             # Gather one random question from each output*.json
-            for filename in sorted(glob.glob("output*.json"), 
+            for filename in sorted(glob.glob("data/output*.json"), 
                                    key=lambda x: int(''.join(filter(str.isdigit, x))) or 0):
                 with open(filename, 'r') as f:
                     questions = json.load(f)
@@ -271,9 +275,10 @@ class Logic:
                     final_questions.append(random.choice(questions))
 
             # Write this set to a unique JSON / TXT file
-            final_json = f"finalOutput_{i+1}.json"
-            final_txt = f"finalOutput_{i+1}.txt"
-
+            final_json = f"data/final/finalOutput_{i+1}.json"
+            final_txt = f"data/final/finalOutput_{i+1}.txt"
+            os.makedirs("data/final", exist_ok=True)
+            
             with open(final_json, 'w') as f:
                 json.dump(final_questions, f, indent=4)
 
@@ -356,9 +361,7 @@ class Logic:
         return all_questions
 
 
-# -------------------------------
-# Example usage / test (optional)
-# -------------------------------
+
 if __name__ == "__main__":
     logic_instance = Logic()
 
