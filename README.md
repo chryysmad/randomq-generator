@@ -131,6 +131,8 @@ pip install -r requirements.txt
 python3 main.py 
 ```
 
+All usage instructions and guidance are integrated within the GUI itself. Each page includes clear, step-by-step directions to help the user navigate and utilize every feature effectively.
+
 
 
 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
