@@ -15,11 +15,11 @@ RUN apt-get update && \
     python3-venv
 
 # Create a non-root user with a dynamic UID (passed as a build argument)
-USER "$USER"
-WORKDIR /app
-
 ARG UID=1000
 ENV USER=devuser
 RUN useradd -m -u "$UID" "$USER"
 
+USER "$USER"
 
+
+WORKDIR /app
