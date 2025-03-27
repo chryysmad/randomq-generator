@@ -1,0 +1,27 @@
+services:
+  randomq:
+    image: randomq
+    build:
+      dockerfile: docker/Dockerfile
+      context: ../
+      args:
+        UID: ${USER_UID}
+        GID: ${USER_GID}
+        USERNAME: ${USERNAME}
+    user: "${USER_UID}:${USER_GID}"
+    environment:
+      - SHELL=/bin/bash
+      - DISPLAY=${DISPLAY}
+      - XAUTHORITY=${HOME}/.Xauthority
+      - SSH_AUTH_SOCK=${SSH_AUTH_SOCK}
+    volumes:
+      - ../:${HOME}/projects/randomq-generator
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${HOME}/.Xauthority:${HOME}/.Xauthority:rw
+      - ${HOME}/.ssh:/home/${USERNAME}/.ssh:ro
+      # - ${SSH_AUTH_SOCK}:${SSH_AUTH_SOCK}
+    network_mode: host
+    stdin_open: true
+    tty: true
+    working_dir: /app/randomq-generator
+    command: /bin/bash
