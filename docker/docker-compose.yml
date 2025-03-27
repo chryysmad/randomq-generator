@@ -19,9 +19,8 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${HOME}/.Xauthority:${HOME}/.Xauthority:rw
       - ${HOME}/.ssh:/home/${USERNAME}/.ssh:ro
-      # - ${SSH_AUTH_SOCK}:${SSH_AUTH_SOCK}
     network_mode: host
     stdin_open: true
     tty: true
-    working_dir: /app/randomq-generator
+    working_dir: ${HOME}
     command: /bin/bash
