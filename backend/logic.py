@@ -63,15 +63,6 @@ class Logic:
         After generation, renames the file by appending h5p_id to the base name.
         """
         h5p_parser.generate("./backend/txt2h5p/control.txt", self.path_to_output_txt)
-        base_name = "example-file"  # Modify if needed
-        default_output = f"{base_name}.h5p"
-        new_name = f"{base_name}{h5p_id}.h5p" if h5p_id else default_output
-
-        if os.path.exists(default_output):
-            os.rename(default_output, new_name)
-            util.logger.info(f"Renamed {default_output} to {new_name}")
-        else:
-            util.logger.error(f"Expected H5P file {default_output} not found.")
 
     def randomize_parameters(self, parameters):
         if not parameters:

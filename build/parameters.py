@@ -106,7 +106,7 @@ class ParametersPage(tk.Frame):
         self.question_full_text = full_text
         self.controller.save_has_visited_parameters(True)
 
-        match = re.search(r'\[([^]]+)\]', full_text)
+        match = re.search(r'\$\$([^$]+)\$\$', full_text)
         if match:
             self.formula_index = match.start()
             self.formula_length = match.end() - match.start()
@@ -115,13 +115,17 @@ class ParametersPage(tk.Frame):
                 util.logger.info(f"Formula text: {formula_text}")
                 self.latex_question = parse_latex(formula_text)
                 util.logger.info(f"Parsed expression: {self.latex_question}")
+                return True
             except Exception as e:
                 util.logger.error(f"Error parsing LaTeX: {e}")
                 self.latex_question = None
+                return False
         else:
+            util.logger.error("No LaTeX expression found in the input.")
             self.latex_question = None
             self.formula_index = None
             self.formula_length = 0
+            return False
 
     def create_top_section(self):
         """
@@ -129,11 +133,11 @@ class ParametersPage(tk.Frame):
           <some text> [LaTeX expression] <some text>
         """
         self.top_canvas.create_text(
-            24.0,
+            32.0,
             10.0,
             anchor="nw",
-            text="Enter your entire question in one line:\n"
-                 "(e.g. 'Solve the equation [x^2 + 3x = 0] for x.')",
+            text=("Enter your entire question in one line. You may add non-evaluated LaTeX formulas using \\(<formula>\\):\n"
+              "(e.g. 'Solve the equation $$x^2 + 3x = 0$$ for \\(x\\)')."),
             fill="#1E1E1E",
             font=("Inter", 16 * -1)
         )
@@ -328,7 +332,10 @@ class ParametersPage(tk.Frame):
 
     def on_next(self):
         # Parse the combined text input and extract formula info.
-        self.convert_latex_to_sympy()
+        
+        if not self.convert_latex_to_sympy():
+            util.logger.error("No valid LaTeX expression found.")
+            return
         self.controller.save_latex_question(self.latex_question)
         self.controller.save_question_text(self.question_full_text)
         self.controller.save_precision(self.precision_entry.get())
