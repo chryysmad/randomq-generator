@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  devcontainer:
+    hostname: ${HOSTNAME}
+    image: dev/randomq
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        UID: ${USER_UID}
+    environment:
+      - SHELL=/bin/bash
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - .:/app/project
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ${DATA_VOLUME}:/app/data
+      - ${OUTPUT_VOLUME}:/app/outputs
+    stdin_open: true
+    tty: true
+    working_dir: /app/project
+    command: /bin/bash
