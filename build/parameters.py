@@ -5,7 +5,7 @@ import sympy as sp
 from sympy.parsing.latex import parse_latex
 from PIL import Image, ImageTk
 import backend.util as util
-import sympy as sp
+import re
 
 class ParametersPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -19,7 +19,13 @@ class ParametersPage(tk.Frame):
         self.param_counter = 1
         self.entries = []
         self.placeholders = {}
+
+        # Variables to store the question text and formula info
+        self.question_full_text = ""
         self.latex_question = None
+        self.formula_index = None
+        self.formula_length = 0
+
         self.parameters_data = []
 
         self.grid_columnconfigure(0, weight=1)
@@ -27,7 +33,7 @@ class ParametersPage(tk.Frame):
         self.grid_rowconfigure(1, weight=1)
         self.grid_rowconfigure(2, weight=0)
 
-        # --- Top section ---
+        # --- Top section with ONE Text Box ---
         self.top_frame = tk.Frame(self, bg="#F5F5F5")
         self.top_frame.grid(row=0, column=0, sticky="ew", padx=10, pady=10)
         self.top_canvas = tk.Canvas(
@@ -35,7 +41,7 @@ class ParametersPage(tk.Frame):
             bg="#F5F5F5",
             bd=0,
             highlightthickness=0,
-            height=350
+            height=220
         )
         self.top_canvas.pack(fill="both", expand=True)
         self.create_top_section()
@@ -70,7 +76,7 @@ class ParametersPage(tk.Frame):
         self.bottom_frame.grid(row=2, column=0, sticky="ew", padx=10, pady=10)
         self.create_bottom_section()
 
-        # --- New Back Button (returns to ControlPage) ---
+        # --- Back Button (returns to ControlPage) ---
         self.back_button = tk.Button(
             self,
             text="Back",
@@ -89,95 +95,93 @@ class ParametersPage(tk.Frame):
         return self.ASSETS_PATH / Path(path)
 
     def convert_latex_to_sympy(self):
-        latex_input = self.entry_1.get("1.0", "end-1c")
+        """
+        Parses the combined text input.
+        Looks for a LaTeX expression enclosed in [ ... ], and if found, records:
+         - The full text as entered,
+         - The starting index and length of the bracketed substring,
+         - Parses the LaTeX expression.
+        """
+        full_text = self.entry_combined.get("1.0", "end-1c")
+        self.question_full_text = full_text
         self.controller.save_has_visited_parameters(True)
-        try:
-            self.latex_question = parse_latex(latex_input)
-            util.logger.info(f"Parsed expression: {self.latex_question}")
-        except Exception as e:
-            util.logger.error(f"Error parsing LaTeX: {e}")
+
+        match = re.search(r'\$\$([^$]+)\$\$', full_text)
+        if match:
+            self.formula_index = match.start()
+            self.formula_length = match.end() - match.start()
+            formula_text = match.group(1)
+            try:
+                util.logger.info(f"Formula text: {formula_text}")
+                self.latex_question = parse_latex(formula_text)
+                util.logger.info(f"Parsed expression: {self.latex_question}")
+                return True
+            except Exception as e:
+                util.logger.error(f"Error parsing LaTeX: {e}")
+                self.latex_question = None
+                return False
+        else:
+            util.logger.error("No LaTeX expression found in the input.")
+            self.latex_question = None
+            self.formula_index = None
+            self.formula_length = 0
+            return False
 
     def create_top_section(self):
+        """
+        Creates a single text box where the user can enter text in the form:
+          <some text> [LaTeX expression] <some text>
+        """
         self.top_canvas.create_text(
-            24.0,
+            32.0,
             10.0,
             anchor="nw",
-            text="Problem Statement",
+            text=("Enter your entire question in one line. You may add non-evaluated LaTeX formulas using \\(<formula>\\):\n"
+              "(e.g. 'Solve the equation $$x^2 + 3x = 0$$ for \\(x\\)')."),
             fill="#1E1E1E",
-            font=("Inter", 20 * -1)
+            font=("Inter", 16 * -1)
         )
-        self.entry_problem = tk.Text(self.top_frame, bd=0, bg="#FFFFFF", fg="#C0C0C0", highlightthickness=0)
-        self.entry_problem.place(x=32.0, y=40.0, width=930.0, height=60)
-        self.placeholders[self.entry_problem] = "Solve this..."
-        self.entry_problem.insert("1.0", self.placeholders[self.entry_problem])
 
-        def on_focus_in_problem(event):
+        self.entry_combined = tk.Text(
+            self.top_frame,
+            bd=0,
+            bg="#FFFFFF",
+            fg="#C0C0C0",
+            highlightthickness=0
+        )
+        self.entry_combined.place(x=32.0, y=60.0, width=930.0, height=80)
+        self.placeholders[self.entry_combined] = "Type your question here: text [LaTeX] text..."
+
+        def on_focus_in(event):
             widget = event.widget
             placeholder = self.placeholders.get(widget)
             if placeholder and widget.get("1.0", "end-1c") == placeholder:
                 widget.delete("1.0", "end")
                 widget.config(fg="#000716")
-        def on_focus_out_problem(event):
+
+        def on_focus_out(event):
             widget = event.widget
             placeholder = self.placeholders.get(widget)
             if placeholder and widget.get("1.0", "end-1c") == "":
                 widget.insert("1.0", placeholder)
                 widget.config(fg="#C0C0C0")
-        self.entry_problem.bind("<FocusIn>", on_focus_in_problem)
-        self.entry_problem.bind("<FocusOut>", on_focus_out_problem)
 
-        self.top_canvas.create_text(
-            24.0,
-            110.0,
-            anchor="nw",
-            text="Latex Question",
-            fill="#1E1E1E",
-            font=("Inter", 20 * -1)
-        )
-        self.top_canvas.create_text(
-            24.0,
-            144.0,
-            anchor="nw",
-            text="Add the question you want in your h5p file in latex form.",
-            fill="#757575",
-            font=("Inter", 16 * -1)
-        )
-        entry_image_1_path = self.relative_to_assets("entry_1.png")
-        self.entry_image_1 = PhotoImage(file=entry_image_1_path)
-        self.top_canvas.create_image(497.0, 238.5, image=self.entry_image_1)
+        self.entry_combined.bind("<FocusIn>", on_focus_in)
+        self.entry_combined.bind("<FocusOut>", on_focus_out)
+        self.entry_combined.insert("1.0", self.placeholders[self.entry_combined])
 
-        self.entry_1 = tk.Text(self.top_frame, bd=0, bg="#FFFFFF", fg="#000716", highlightthickness=0)
-        self.entry_1.place(x=32.0, y=170.0, width=930.0, height=115.0)
-        self.placeholders[self.entry_1] = "Add here..."
-        def on_focus_in(event):
-            entry = event.widget
-            placeholder = self.placeholders.get(entry)
-            if placeholder and entry.get("1.0", "end-1c") == placeholder:
-                entry.delete("1.0", "end")
-                entry.config(fg="#000716")
-        def on_focus_out(event):
-            entry = event.widget
-            placeholder = self.placeholders.get(entry)
-            if placeholder and entry.get("1.0", "end-1c") == "":
-                entry.insert("1.0", placeholder)
-                entry.config(fg="#C0C0C0")
-        self.entry_1.bind("<FocusIn>", on_focus_in)
-        self.entry_1.bind("<FocusOut>", on_focus_out)
-        self.entry_1.insert("1.0", self.placeholders[self.entry_1])
-        self.entry_1.config(fg="#C0C0C0")
-        
-        def validate_digit(P):
-            return P.isdigit() or P == ""
-        vcmd = self.register(validate_digit)
-        self.top_canvas.create_line(0, 295, 1000, 295, fill="#F5F5F5")
         self.top_canvas.create_text(
             32.0,
-            295.0,
+            155.0,
             anchor="nw",
             text="Precision:",
             fill="#1E1E1E",
             font=("Inter", 16 * -1)
         )
+
+        def validate_digit(P):
+            return P.isdigit() or P == ""
+        vcmd = self.register(validate_digit)
         self.precision_entry = tk.Entry(
             self.top_frame,
             bd=0,
@@ -187,9 +191,9 @@ class ParametersPage(tk.Frame):
             validate="key",
             validatecommand=(vcmd, '%P')
         )
-        self.precision_entry.place(x=150.0, y=290.0, width=100.0, height=30)
+        self.precision_entry.place(x=150.0, y=150.0, width=100.0, height=30)
         self.precision_entry.insert(0, "0")
-        
+
     def create_bottom_section(self):
         self.button_image_1 = PhotoImage(file=self.relative_to_assets("button_1.png"))
         self.button_image_2 = PhotoImage(file=self.relative_to_assets("button_2.png"))
@@ -327,8 +331,18 @@ class ParametersPage(tk.Frame):
         self.update_scroll_region()
 
     def on_next(self):
-        self.convert_latex_to_sympy()
+        # Parse the combined text input and extract formula info.
+        
+        if not self.convert_latex_to_sympy():
+            util.logger.error("No valid LaTeX expression found.")
+            return
         self.controller.save_latex_question(self.latex_question)
+        self.controller.save_question_text(self.question_full_text)
+        self.controller.save_precision(self.precision_entry.get())
+        # Save formula index and length if available
+        if self.formula_index is not None:
+            self.controller.save_formula_index(self.formula_index)
+            self.controller.save_formula_length(self.formula_length)
 
         self.parameters_data.clear()
         for param_frame in self.entries:
@@ -343,8 +357,6 @@ class ParametersPage(tk.Frame):
 
         self.controller.save_parameters(self.parameters_data)
         self.controller.show_frame("CorrectPage")
-        self.controller.save_question_text(self.entry_problem.get("1.0", "end-1c"))
-        self.controller.save_precision(self.precision_entry.get())
 
     def delete_parameter(self, param_frame):
         if self.entries and self.entries[0] == param_frame:
