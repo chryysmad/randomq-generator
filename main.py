@@ -27,7 +27,9 @@ class BaseApp(tk.Tk):
             "wrong_answers": [], 
             "answer_number": None,
             "randomization_count": 0,
-            "precision": 0
+            "precision": 0,
+            "formula_index":0,
+            "formula_length": 0
         }
 
         self.title("Random Question Generator")
@@ -70,6 +72,11 @@ class BaseApp(tk.Tk):
 
     def save_precision(self, precision):
         self.shared_data["precision"] = precision
+
+    def save_formula_index(self, formula_index):
+        self.shared_data["formula_index"] = formula_index
+    def save_formula_length(self, formula_length):
+        self.shared_data["formula_length"] = formula_length
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Random Question Generator")
