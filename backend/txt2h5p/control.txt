@@ -1,4 +1,4 @@
-NAME_H5P: example-please.h5p
+NAME_H5P: example-file.h5p
 TITLE: "This is the Title of the Quiz!"
 AUTHOR: "chryysmad"
 LICENSE: "ODC PDDL"
