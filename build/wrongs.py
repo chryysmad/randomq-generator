@@ -261,24 +261,36 @@ class WrongsPage(tk.Frame):
 
     def process_entries_and_continue(self):
         self.wrong_answers.clear()
+        if self.entries is None or len(self.entries) == 0:
+            util.logger.error("No entries provided.")
+            return
 
+        valid_answers = 0
         for option_frame in self.entries:
             selected_type = option_frame['type_var'].get()
             text = option_frame['entry'].get().strip()
 
-            if not text:
+            # Skip empty entries
+            if not text or text == "Enter the string or LaTeX function...":
                 self.wrong_answers.append("")
                 continue
 
             if selected_type == "text":
                 self.wrong_answers.append(text)
+                valid_answers += 1
             else:
                 try:
                     sympy_expr = parse_latex(text)
                     self.wrong_answers.append(sympy_expr)
+                    valid_answers += 1
                 except Exception as e:
                     util.logger.error(f"Error parsing LaTeX: {e}")
                     self.wrong_answers.append(None)
+
+        if valid_answers == 0:
+            # Show error message to user
+            util.logger.error("No valid answers provided.")
+            return
 
         self.collect_wrong_answers()
         self.controller.show_frame("RandomizerPage")

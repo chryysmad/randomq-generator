@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import Canvas, Entry, Button, PhotoImage
 from build.intro import IntroPage
 from backend.logic import Logic
+from backend import util
 
 class RandomizerPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -99,14 +100,23 @@ class RandomizerPage(tk.Frame):
         self.controller.shared_data["randomization_count"] = self.randomization_count
 
     def process_randomization_count(self):
+        input_value = self.entry_1.get().strip()
+        if input_value == "Enter a value..." or not input_value:
+            util.logger.error("RandomizerPage: process_randomization_count: No value entered.")
+            return
         try:
-            self.randomization_count = int(self.entry_1.get().strip())
+            self.randomization_count = int(input_value)
+            if self.randomization_count <= 0:
+                util.logger.error("RandomizerPage: process_randomization_count: Invalid value entered.")
+                return
+                
+            self.save_randomization_count()
+            self.logic.perform_logic(self.controller.shared_data)
+            self.controller.shared_data["file_counter"] = self.logic.file_counter
+            self.controller.show_frame("IntroPage")
+            
         except ValueError:
-            self.randomization_count = 0
-        self.save_randomization_count()
-        self.logic.perform_logic(self.controller.shared_data)
-        self.controller.shared_data["file_counter"] = self.logic.file_counter
-        self.controller.show_frame("IntroPage")
+            util.logger.error("RandomizerPage: process_randomization_count: Invalid value entered.")
 
     def go_back(self):
         self.controller.show_frame("CorrectPage")
